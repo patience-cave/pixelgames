@@ -3,6 +3,8 @@
 def initialize(grid):
     grid.size = [6,6]
     grid.colors = ["gray", "dark green", "green", "black", "red"]
+    # grid.maximum_moves = 10
+    # grid.level = 10
 
 def begin(grid, state):
     state.body = [(0,0)]
@@ -28,27 +30,14 @@ def press_button(grid, state, button):
             grid.set(state.current_fruit, 4)
 
     state.body.append(head)
-
-    #if len(game_state['body']) > 4:
-    #    tail = game_state['body'].pop(0)
-    #    if not tail in game_state['body']:
-    #        paint(tail, 0)
+    print(head)
 
     grid.set(head, 2)
     grid.set(state.body[-2], 1)
 
+
+
 def press_tile(grid, state, x, y):
     pass
 
-
-# maybe add a begin update and finish update functions...
-
-# def update(event, game_state, board):
-
-#     if event['type'] == "press_button":
-#         if event['button'] == "up":
-
-#             head = game_state['body'][-1]
-#             head[1] += 1
-#             board.set([0,0], 1)
 

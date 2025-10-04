@@ -137,6 +137,9 @@ class State(dict):
         copied = State(copy.deepcopy(dict(self), memo))
         return copied
 
+def remove_empty_elements(l):
+    return [x for x in l if x != []]
+
 
 import copy
 
@@ -169,6 +172,8 @@ class grid_stateful:
         self.methods.get = self.get
         self.methods.size = [8,8]
         self.methods.colors = ["black", "white"]
+        self.methods.next_frame = self.new_frame
+        self.methods.moves = 0
 
     def initialize(self):
 
@@ -216,7 +221,8 @@ class grid_stateful:
             return self.grid.get(position)
         return -1
 
-
+    # returns the current action plus and animation buffer
+    # returns the full animation [[action], [action], [action], ...]
     def resolve_action(self, a, isundo=False):
 
         if a == None:
@@ -229,25 +235,35 @@ class grid_stateful:
                 self.grid.set(a["position"], a["from_color"])
                 a["from_color"], a["to_color"] = a["to_color"], a["from_color"]
 
-            return [{
+            return [[{
                 "result": "change_color",
                 "position": a["position"],
                 "to_color": self._state_to_color(a["to_color"])
-            }]
+            }]]
 
         elif a["type"] == "animation":
 
             # play the animation backwards if you are undoing
             if isundo:
-                a["list"] = a["list"][::-1]
+               a["list"] = a["list"][::-1]
 
-            # the first frame of the animation should happen
-            first_animation = a["list"][0]
-            resolve_first_animation = self.resolve_action(first_animation, isundo)
+            o = []
+            for i in a['list']:
+                p = self.resolve_action(i, isundo)
+                o += p
+            return o
 
-            self.animations += [self.resolve_action(i, isundo) for i in a['list'][1:]]
+            # # the first frame of the animation should happen
+            # first_animation = a["list"][0]
+            # resolve_first_animation = self.resolve_action(first_animation, isundo)
 
-            return resolve_first_animation
+            # animations_buffer = [self.resolve_action(i, isundo) for i in a['list'][1:]]
+
+            # animations, buffer = 
+
+            # self.animations += [self.resolve_action(i, isundo) for i in a['list'][1:]]
+
+            # return resolve_first_animation
 
         elif a["type"] == "many":
 
@@ -255,21 +271,38 @@ class grid_stateful:
             if isundo:
                 a["list"] = a["list"][::-1]
 
-            o = []
+            o = [[]]
             for i in a['list']:
-                o += self.resolve_action(i, isundo)
+                p = self.resolve_action(i, isundo)
+                if len(p) == 1:
+                    o[-1] += p[0]
+                else:
+                    o += p
+                    o += [[]]
+            o = remove_empty_elements(o)
+
             return o
 
         elif a["type"] == "undo":
             assert(not isundo)
             return self.resolve_action(a["action"], True)
 
+    def has_intended_actions(self):
+
+        self.intended_actions = remove_empty_elements(self.intended_actions)
+
+        for i in self.intended_actions:
+            if i: return True
+
+        self.intended_actions = [[]]
+        return False
 
     def resolve_intended_actions(self, ia):
 
+        if not self.has_intended_actions(): return
         # if the final animation has not been populated, remove it
         while len(ia) and (not ia[-1]): ia.pop(-1)
-        if not ia: return
+        assert(ia)
 
         # if there is only one action to animate
         if len(ia) == 1:
@@ -319,7 +352,15 @@ class grid_stateful:
         if not action["type"] == "undo":
             self.moves.append(action)
 
-        return self.resolve_action(action)
+        # if it returns more than one action
+        # pop the other actions into the animation
+
+        actions = self.resolve_action(action)
+
+        first_action = actions.pop(0)
+        self.animations = actions
+
+        return first_action# self.resolve_action(action)
 
     def press_tile(self, position):
         if self.animations: return []
@@ -329,7 +370,8 @@ class grid_stateful:
             self.press_tile_method(self.methods, current_state, position[0], position[1])
 
             # do not save the new state if no changes happened on screen
-            if self.intended_actions[-1]:
+            if self.has_intended_actions():
+                self.methods.moves += 1
                 self.states.append(current_state)
 
 
@@ -361,7 +403,8 @@ class grid_stateful:
             self.press_button_method(self.methods, current_state, button_state)
             #self.press_button_method(button_state, current_state, self.set, self.get)
             # do not save the new state if no changes happened on screen
-            if self.intended_actions[-1]:
+            if self.has_intended_actions():
+                self.methods.moves += 1
                 self.states.append(current_state)
 
     def begin(self):

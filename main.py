@@ -168,7 +168,7 @@ def main():
             dirty.clear()
 
         if game_board.board.animations:
-            clock.tick(20)
+            clock.tick(5)
         else:
             clock.tick(60)
 
