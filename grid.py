@@ -231,10 +231,11 @@ class grid_stateful:
 
             # the first frame of the animation should happen
             first_animation = a["list"][0]
+            resolve_first_animation = self.resolve_action(first_animation, isundo)
 
             self.animations += [self.resolve_action(i, isundo) for i in a['list'][1:]]
 
-            return self.resolve_action(first_animation, isundo)
+            return resolve_first_animation
 
         elif a["type"] == "many":
 
@@ -361,13 +362,29 @@ class grid_stateful:
         self.moves.pop()
 
     def reset(self):
-        self.states = []# [self.states[0]]
-        self.moves = []
-        self.animations = []
-        self.intended_actions = [[]]
 
-        self.initialize()
-        self.begin()
+        if self.intended_actions[0]: return
+        if self.animations: return
+        if len(self.moves) <= 1: return
+
+        self.intended_actions[-1].append({
+            "type": "undo",
+            "action": {
+                "type": "animation",
+                "list": self.moves[1:]
+            }
+        })
+
+        self.states = [self.states[0]]
+        self.moves = [self.moves[0]]
+
+        # self.states = []
+        # self.moves = []
+        #self.animations = []
+        #self.intended_actions = [[]]
+
+        #self.initialize()
+        #self.begin()
         pass
 
     def make_color_grid(self):
