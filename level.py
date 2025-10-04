@@ -1,56 +1,43 @@
 
 
-# the beginning state
+def initialize(grid):
+    grid.size = [6,6]
+    grid.colors = ["gray", "dark green", "green", "black", "red"]
 
-def initialize():
-    return {
-        "size": [6, 6],
-        "colors": ["gray", "dark green", "green", "black", "red"]
-    }
+def begin(grid, state):
+    state.body = [(0,0)]
+    state.fruit = [(4,1), (2,3), (1,0), (4,3)]
+    state.current_fruit = state.fruit.pop(0)
+    grid.set([0,0], 2)
+    for fruit in state.fruit:
+        grid.set(fruit, 3)
+    grid.set(state.current_fruit, 4)
 
-def begin(state, paint):
-    state['body'] = [(0,0)]
-    state['fruit'] = [(4,1), (2,3), (1,0), (4,3)]
-    state['current_fruit'] = state['fruit'].pop(0)
-    paint([0,0], 2)
-    for fruit in state['fruit']:
-        paint(fruit, 3)
-    paint(state['current_fruit'], 4)
+def press_button(grid, state, button):
 
-def press_button(button, state, paint, get):
+    head = state.body[-1]
 
-    head = state['body'][-1]
+    head = (head[0] + button.dx, head[1] + button.dy)
 
-    if button == 'up':
-        head = (head[0], head[1]+1)
-    elif button == "down":
-        head = (head[0], head[1]-1)
-    elif button == "right":
-        head = (head[0]+1, head[1])
-    elif button == "left":
-        head = (head[0]-1, head[1])
-
-    if get(head) not in [0, 4]:
+    if grid.get(head) not in [0, 4]:
         return
 
-    if get(head) == 4:
-        if state['fruit']:
-            state['current_fruit'] = state['fruit'].pop(0)
-            paint(state['current_fruit'], 4)
+    if grid.get(head) == 4:
+        if state.fruit:
+            state.current_fruit = state.fruit.pop(0)
+            grid.set(state.current_fruit, 4)
 
-    state['body'].append(head)
+    state.body.append(head)
 
     #if len(game_state['body']) > 4:
     #    tail = game_state['body'].pop(0)
     #    if not tail in game_state['body']:
     #        paint(tail, 0)
 
-    paint(head, 2)
-    paint(state['body'][-2], 1)
+    grid.set(head, 2)
+    grid.set(state.body[-2], 1)
 
-
-def press_tile(x, y, game_state, paint, get):
-    #print(x, y)
+def press_tile(grid, state, x, y):
     pass
 
 

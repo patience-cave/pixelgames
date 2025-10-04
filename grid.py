@@ -128,6 +128,16 @@ _color_to_rgb = {
 }
 
 
+class State(dict):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__dict__ = self
+
+    def __deepcopy__(self, memo):
+        copied = State(copy.deepcopy(dict(self), memo))
+        return copied
+
+
 import copy
 
 """
@@ -154,20 +164,22 @@ class grid_stateful:
         self.colors = None
         self.grid = None
 
+        self.methods = State()
+        self.methods.set = self.set
+        self.methods.get = self.get
+        self.methods.size = [8,8]
+        self.methods.colors = ["black", "white"]
+
     def initialize(self):
 
         if self.initialize_method != None:
-            result = self.initialize_method()
-        else:
-            result = {"size": [8, 8], "colors": ["black", "white"]}
-
-        self.size = result["size"]
-        colors = result["colors"]
-
-        symbols = len(colors)
+            self.initialize_method(self.methods)
+        
+        self.size = self.methods.size
+        self.colors = self.methods.colors
 
         if self.grid == None:
-            self.colors = colors
+            symbols = len(self.colors)
             self.grid = grid(self.size, symbols)
         else:
             for x in range(self.size[0]):
@@ -314,7 +326,7 @@ class grid_stateful:
 
         if self.press_tile_method != None:
             current_state = copy.deepcopy(self.states[-1])
-            self.press_tile_method(position[0], position[1], current_state, self.set, self.get)
+            self.press_tile_method(self.methods, current_state, position[0], position[1])
 
             # do not save the new state if no changes happened on screen
             if self.intended_actions[-1]:
@@ -331,9 +343,23 @@ class grid_stateful:
             self.undo()
             return
 
+        button_state = State()
+        button_state.dx = 0
+        button_state.dy = 0
+        button_state.up = button == 'up'
+        button_state.down = button == 'down'
+        button_state.right = button == 'right'
+        button_state.left = button == 'left'
+
+        if button_state.up or button_state.down:
+            button_state.dy = 1 if button_state.up else -1
+        else:
+            button_state.dx = 1 if button_state.right else -1
+
         if self.press_button_method != None:
             current_state = copy.deepcopy(self.states[-1])
-            self.press_button_method(button, current_state, self.set, self.get)
+            self.press_button_method(self.methods, current_state, button_state)
+            #self.press_button_method(button_state, current_state, self.set, self.get)
             # do not save the new state if no changes happened on screen
             if self.intended_actions[-1]:
                 self.states.append(current_state)
@@ -341,8 +367,8 @@ class grid_stateful:
     def begin(self):
         if self.moves == []:
             if self.begin_method != None:
-                current_state = {}
-                self.begin_method(current_state, self.set)
+                current_state = State()
+                self.begin_method(self.methods, current_state)
                 self.states.append(current_state)
 
 
