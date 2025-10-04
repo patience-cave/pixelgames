@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Tap a Block to Turn It White</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    html, body {
+      height: 100%;
+      background: #191919;
+      margin: 0;
+      color: #eaeaea;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+    }
+    header {
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    .status { opacity: 0.8; font-size: 0.9rem; }
+    #container {
+      position: absolute; inset: 0;
+      display: grid; grid-template-rows: auto 1fr;
+    }
+    #stage-wrap {
+      position: relative; overflow: hidden;
+    }
+    canvas {
+      display: block;
+      width: 100%; height: 100%;
+      image-rendering: pixelated;
+      cursor: pointer;
+    }
+    .keys { margin-left: auto; display: flex; gap: 8px; }
+    kbd { background: #2b2b2b; padding: 2px 6px; border-radius: 6px; border: 1px solid #3b3b3b; }
+    a { color: #8ac6ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+  <!-- Pyodide loads Python in the browser. The CDN version here is broadly compatible. -->
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+</head>
+<body>
+  <div id="container">
+    <header>
+      <strong>Tap a Block to Turn It White</strong>
+      <span class="status" id="status">loading Python…</span>
+      <div class="keys">
+        <span class="status">keys:</span>
+        <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>
+        <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd>
+        <kbd>Space</kbd><kbd>Enter</kbd><kbd>0</kbd>
+      </div>
+    </header>
+    <div id="stage-wrap">
+      <canvas id="stage"></canvas>
+    </div>
+  </div>
+
+  <script type="module">
+    // --------------------------
+    // Python bridge via Pyodide
+    // --------------------------
+    let pyodide, boardReady = false;
+
+    async function loadPython() {
+      pyodide = await loadPyodide({ stdout: console.log, stderr: console.error });
+
+      // Make sure the browser can fetch your local files. Put grid.py and level.py
+      // right next to this HTML file (same directory).
+      // We mount the current directory as / (root) in Pyodide’s virtual FS, and fetch.
+      // For local file:// usage, most browsers allow fetch of same-dir files; if not,
+      // serve with a tiny static server (e.g., `python -m http.server`).
+      const fetchText = async (path) => (await fetch(path)).text();
+
+      // Load your Python modules into Pyodide’s FS
+      const gridSrc  = await fetchText("./grid.py");
+      const levelSrc = await fetchText("./level.py");
+      pyodide.FS.writeFile("grid.py", gridSrc);
+      pyodide.FS.writeFile("level.py", levelSrc);
+
+      // Define helpers in Python so JS can call straight into your board.
+      await pyodide.runPythonAsync(`
+from grid import grid_stateful
+from level import press_button, press_tile, initialize, begin
+
+# Create and wire the board, exactly like your Python
+board = grid_stateful()
+board.begin_method = begin
+board.press_button_method = press_button
+board.press_tile_method = press_tile
+board.initialize_method = initialize
+board.input({"event": "init"})
+
+def py_get_size():
+    # board.size = (width, height)
+    return tuple(board.size)
+
+def py_get_color_grid():
+    return board.input("color_grid")
+
+def py_begin():
+    board.input({"event": "begin"})
+
+def py_press_tile(c, r):
+    return board.input({"event": "press_tile", "position": [c, r]})
+
+def py_press_button(name):
+    return board.input({"event": "press_button", "button": name})
+
+def py_update():
+    out = list(board.input("update"))
+    anim = bool(board.animations if hasattr(board, "animations") else getattr(board, "board", None) and getattr(board.board, "animations", False))
+    return out, anim
+      `);
+
+      boardReady = true;
+      document.getElementById("status").textContent = "ready";
+    }
+
+    // --------------------------
+    // Canvas + layout (JS)
+    // --------------------------
+    const canvas = document.getElementById("stage");
+    const ctx = canvas.getContext("2d");
+    const DPR = () => (window.devicePixelRatio || 1);
+
+    // Configurable bits (mirrors your Python class fields)
+    let N_COLS = 0, N_ROWS = 0;
+    let MARGIN_PX = 1;
+    let INITIAL_SIZE = [800, 600]; // replaced at runtime after reading board size + block size
+    let CELL_SIZE = 0, X0 = 0, Y0 = 0;
+    let colors = [];      // [row][col] -> [r,g,b]
+    let rects = [];       // [row][col] -> {x,y,w,h}
+    const BLOCK_BX = 50;  // same default as your __init__(block_bx=50)
+
+    function setCanvasCSSSize(wCSS, hCSS) {
+      const dpr = DPR();
+      canvas.width = Math.max(1, Math.floor(wCSS * dpr));
+      canvas.height = Math.max(1, Math.floor(hCSS * dpr));
+      canvas.style.width = `${wCSS}px`;
+      canvas.style.height = `${hCSS}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function layout(w, h) {
+      const rows = N_ROWS, cols = N_COLS, margin = MARGIN_PX;
+
+      const cell = Math.min(
+        Math.floor((w - (cols + 1) * margin) / cols),
+        Math.floor((h - (rows + 1) * margin) / rows)
+      );
+      CELL_SIZE = Math.max(1, cell);
+      const gridW = cols * CELL_SIZE + (cols + 1) * margin;
+      const gridH = rows * CELL_SIZE + (rows + 1) * margin;
+      X0 = Math.floor((w - gridW) / 2);
+      Y0 = Math.floor((h - gridH) / 2);
+      return [X0, Y0, CELL_SIZE];
+    }
+
+    function buildRects() {
+      const x0 = X0, y0 = Y0, cell = CELL_SIZE, margin = MARGIN_PX;
+      const rows = N_ROWS, cols = N_COLS;
+      const out = [];
+      for (let r = 0; r < rows; r++) {
+        const rowRects = [];
+        for (let c = 0; c < cols; c++) {
+          const x = x0 + margin + c * (cell + margin);
+          const y = y0 + margin + (rows - 1 - r) * (cell + margin); // flipped like your code
+          rowRects.push({ x, y, w: cell, h: cell });
+        }
+        out.push(rowRects);
+      }
+      return out;
+    }
+
+    function cellAt(mx, my) {
+      const cols = N_COLS, rows = N_ROWS, margin = MARGIN_PX, cell = CELL_SIZE, x0 = X0, y0 = Y0;
+      const relX = mx - x0, relY = my - y0;
+      if (relX < 0 || relY < 0) return null;
+      const stride = cell + margin;
+      const c = Math.floor(relX / stride);
+      const r = Math.floor(relY / stride);
+      if (r >= 0 && r < rows && c >= 0 && c < cols) {
+        // return (row, col) with flipped row index to match Python
+        return [rows - 1 - r, c];
+      }
+      return null;
+    }
+
+    function rgbStr([r, g, b]) {
+      return `rgb(${r|0},${g|0},${b|0})`;
+    }
+
+    function drawAll() {
+      ctx.fillStyle = "rgb(25,25,25)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      for (let r = 0; r < N_ROWS; r++) {
+        for (let c = 0; c < N_COLS; c++) {
+          const rect = rects[r][c];
+          ctx.fillStyle = rgbStr(colors[r][c]);
+          ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+        }
+      }
+    }
+
+    function drawCell(r, c) {
+      const rect = rects[r][c];
+      ctx.fillStyle = rgbStr(colors[r][c]);
+      ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+    }
+
+    // --------------------------------
+    // Initialize board from Python side
+    // --------------------------------
+    async function bootstrap() {
+      await loadPython();
+
+      // Read board size from Python and set up grid
+      // py_get_size returns (width, height) in tiles
+      const [width, height] = pyodide.runPython("py_get_size()");
+      N_COLS = width;
+      N_ROWS = height;
+
+      // INITIAL_SIZE mirrors your block size * tiles (like __init__)
+      INITIAL_SIZE = [N_COLS * BLOCK_BX, N_ROWS * BLOCK_BX];
+
+      // Set canvas CSS size initially to INITIAL_SIZE, then layout
+      setCanvasCSSSize(INITIAL_SIZE[0], INITIAL_SIZE[1]);
+      layout(INITIAL_SIZE[0], INITIAL_SIZE[1]);
+
+      // Pull the color grid from Python
+      // Ensure conversion to plain JS arrays
+      const pyColors = pyodide.runPython("py_get_color_grid()");
+      colors = pyColors.toJs({ create_proxies: false });
+
+      rects = buildRects();
+      drawAll();
+
+      // Tell Python level logic to begin (like your main())
+      pyodide.runPython("py_begin()");
+
+      // Start loop
+      requestAnimationFrame(tick);
+    }
+
+    // --------------------------
+    // Event handling
+    // --------------------------
+    function resizeToContainer() {
+      const wrap = document.getElementById("stage-wrap");
+      const w = wrap.clientWidth;
+      const h = wrap.clientHeight;
+      setCanvasCSSSize(w, h);
+      layout(w, h);
+      rects = buildRects();
+      drawAll();
+    }
+
+    // Resize canvas when window changes
+    new ResizeObserver(() => resizeToContainer()).observe(document.getElementById("stage-wrap"));
+
+    canvas.addEventListener("mousedown", (ev) => {
+      if (!boardReady) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = ev.clientX - rect.left;
+      const y = ev.clientY - rect.top;
+      const hit = cellAt(x, y);
+      if (!hit) return;
+      const [r, c] = hit;
+      // Send to Python: position = [c, r]
+      pyodide.runPython(`py_press_tile(${c}, ${r})`);
+    });
+
+    const keyMap = {
+      " ": "space",
+      "a": "left", "A": "left",
+      "w": "up",   "W": "up",
+      "s": "down", "S": "down",
+      "d": "right","D": "right",
+      "ArrowUp": "up",
+      "ArrowDown": "down",
+      "ArrowLeft": "left",
+      "ArrowRight": "right",
+      "Enter": "undo",
+      "0": "reset"
+    };
+
+    window.addEventListener("keydown", (ev) => {
+      const button = keyMap[ev.key];
+      if (!button || !boardReady) return;
+      ev.preventDefault();
+      pyodide.runPython(`py_press_button("${button}")`);
+    });
+
+    // --------------------------
+    // Game loop (poll updates)
+    // --------------------------
+    function tick() {
+      if (boardReady) {
+        // Get a PyProxy result
+        const pyRes = pyodide.runPython("py_update()");
+        // Convert to plain JS (tuple -> array, dict -> plain object)
+        const [updates, anim] = pyRes.toJs({
+          create_proxies: false,
+          dict_converter: Object.fromEntries
+        });
+        // Free the proxy
+        pyRes.destroy();
+
+        for (const u of updates) {
+          if (u.result === "change_color") {
+            const r = u.position[1];
+            const c = u.position[0];
+            colors[r][c] = u.to_color;
+            drawCell(r, c);
+          }
+        }
+        // you can use `anim` if you want to conditionally throttle
+      }
+      requestAnimationFrame(tick);
+    }
+
+    // Kick everything off
+    bootstrap();
+  </script>
+</body>
+</html>
