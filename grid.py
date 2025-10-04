@@ -151,6 +151,8 @@ class grid_stateful:
         self.press_tile_method = None
         self.press_button_method = None
         self.initialize_method = None
+        self.colors = None
+        self.grid = None
 
     def initialize(self):
 
@@ -163,9 +165,14 @@ class grid_stateful:
         colors = result["colors"]
 
         symbols = len(colors)
-        
-        self.colors = colors
-        self.grid = grid(self.size, symbols)
+
+        if self.grid == None:
+            self.colors = colors
+            self.grid = grid(self.size, symbols)
+        else:
+            for x in range(self.size[0]):
+                for y in range(self.size[1]):
+                    self.set([x,y],0)
 
     def _state_to_color(self, state):
         return _color_to_rgb[self.colors[state]]
@@ -354,8 +361,13 @@ class grid_stateful:
         self.moves.pop()
 
     def reset(self):
-        print("Reset")
-        self.states = [self.states[0]]
+        self.states = []# [self.states[0]]
+        self.moves = []
+        self.animations = []
+        self.intended_actions = [[]]
+
+        self.initialize()
+        self.begin()
         pass
 
     def make_color_grid(self):

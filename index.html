@@ -72,7 +72,10 @@
       // We mount the current directory as / (root) in Pyodide’s virtual FS, and fetch.
       // For local file:// usage, most browsers allow fetch of same-dir files; if not,
       // serve with a tiny static server (e.g., `python -m http.server`).
-      const fetchText = async (path) => (await fetch(path)).text();
+      const fetchText = async (path) =>
+        (await fetch(path + `?v=${Date.now()}`, { cache: "no-store" })).text();
+      // cached option
+      // const fetchText = async (path) => (await fetch(path)).text();
 
       // Load your Python modules into Pyodide’s FS
       const gridSrc  = await fetchText("./grid.py");
