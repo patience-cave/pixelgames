@@ -75,7 +75,8 @@ def resolve_intended_actions(self, ia):
 
     if not self.has_intended_actions(): return
     # if the final animation has not been populated, remove it
-    while len(ia) and (not ia[-1]): ia.pop(-1)
+    ia = remove_empty_elements(ia)
+    
     assert(ia)
 
     # if there is only one action to animate

@@ -11,7 +11,10 @@ class grid_stateful:
     def __init__(self):
 
         self.current_state = None
+
         self.size = None
+        self.actual_size = None
+        self.resolution = None
         self.colors = None
 
         # --------------------------------
@@ -61,11 +64,13 @@ class grid_stateful:
         initial_state.set = self.set
         initial_state.get = self.get
         initial_state.size = [8,8]
+        initial_state.resolution = [1, 1]
+        initial_state.actual_size = [8,8]
         initial_state.colors = ["black", "white"]
         initial_state.next_frame = self.next_frame
         initial_state.move = 0
-        initial_state.win = self.win
-        initial_state.lose = self.lose
+        initial_state.win = False
+        initial_state.lose = False
         initial_state.level = 1
         initial_state.attempt = 1
         initial_state.max_moves = float('inf')
@@ -75,24 +80,31 @@ class grid_stateful:
         initial_state.intended_actions = [[]]
 
         # these methods are not deepcopied because they are bound to the original object
-        initial_state._no_deepcopy_keys = ["set", "get", "next_frame", "win", "lose"]
+        initial_state._no_deepcopy_keys = ["set", "get", "next_frame"]
 
 
         # if no initialize method is set, the default values will remain
         if self.initialize_method != None:
             self.initialize_method(initial_state)
-        
+
+            # correct the actual size given the resolution
+            if type(initial_state.resolution) == int:
+                initial_state.resolution = [initial_state.resolution] * len(initial_state.size)
+            assert(len(initial_state.size) == len(initial_state.resolution))
+            initial_state.actual_size = [i * j for i,j in zip(initial_state.size, initial_state.resolution)]
+
         # ensure size and colors are public variables
         self.size = initial_state.size
         self.colors = initial_state.colors
+        self.resolution = initial_state.resolution
+        self.actual_size = initial_state.actual_size
 
         assert(self.current_state == None)
 
         symbols = len(self.colors)
-        initial_state.grid = grid(self.size, symbols)
+        initial_state.grid = grid(self.actual_size, symbols)
 
         self.current_state = initial_state
-
 
 
     def iterate_grid(self):

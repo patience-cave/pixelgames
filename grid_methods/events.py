@@ -6,6 +6,15 @@ def input(self, code):
     else:
         event = code['event']
 
+    if self.current_state != None:
+        if self.current_state.level > self.current_state.max_levels:
+            if event in ["undo", "reset"]:
+                pass
+            elif event == "press_button" and code["button"] in ["undo", "reset"]:
+                pass
+            else:
+                return
+
     if event == "press_tile":
         self.press_tile(code['position'])
 
@@ -32,5 +41,10 @@ def input(self, code):
 
     elif event == "next_frame":
         self.next_frame()
+
+    if self.current_state.win:
+        self.win()
+    elif self.current_state.lose:
+        self.lose()
     
     

@@ -5,7 +5,7 @@ from level import press_button, press_tile, initialize, begin
 
 class game:
 
-    def __init__(self, margin_px=1, block_bx=50):
+    def __init__(self, margin_px=1, block_bx=10):
 
         self.board = grid_stateful()
         self.board.begin_method = begin
@@ -14,9 +14,9 @@ class game:
         self.board.initialize_method = initialize
         
         self.input({"event": "init"})
-        width = self.board.size[0]
-        height = self.board.size[1]
-        
+        width = self.board.actual_size[0]
+        height = self.board.actual_size[1]
+
         # ---- configurable bits ----
         self.N_COLS = width
         self.N_ROWS = height

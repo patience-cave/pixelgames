@@ -1,26 +1,44 @@
 from grid_methods.spotlight import spotlight_changes
 
-def lose(self):
+def lose(self, animated=True, use_attempt=True):
 
-    speed = (max(self.size[0],self.size[1]) / 2) / 20
+    speed = (max(self.actual_size[0],self.actual_size[1]) / 2) / 20
     time = 0.3
 
-    spots = spotlight_changes(self.size[0], self.size[1], speed / time )
+    spots = spotlight_changes(self.actual_size[0], self.actual_size[1], speed / time )
 
-    for i in spots[::-1]:
-        for j in i:
-            self.set(j, 4)
-        self.next_frame()
+    if animated:
+
+        for i in spots[::-1]:
+            for j in i:
+                self.set(j, 6, False)
+            self.next_frame()
+
 
     for i in spots:
         for j in i:
-            self.set(j, 0)
+            self.set(j, 0, False)
 
-    #self.states = [self.states[0]]
+
+    if use_attempt:
+        on_attempt = self.current_state.attempt + 1
+    else:
+        on_attempt = self.current_state.attempt
+
+    on_level = self.current_state.level
+
     self.current_state = self.states[0].duplicate()
+    self.states = [self.states[0]]
+
+    if on_attempt > self.current_state.max_attempts:
+        self.current_state.attempt = 1
+        self.current_state.level = 1
+    else:
+        self.current_state.level = on_level
+        self.current_state.attempt = on_attempt
 
     for i in self.iterate_grid():
-        self.set(i, 0)
+        self.set(i, 0, False)
 
     self.begin()
 
@@ -28,10 +46,13 @@ def lose(self):
     for i in spots[::-1]:
         o.append([])
         for j in i:
-            o[-1].append((j, self.get(j)))
-            self.set(j, 4)
+            o[-1].append((j, self.get(j, False)))
+            self.set(j, 6, False)
 
+    
     for i in o[::-1]:
         for j, k in i:
-            self.set(j, k)
-        self.next_frame()
+            self.set(j, k, False)
+        
+        if animated:
+            self.next_frame()

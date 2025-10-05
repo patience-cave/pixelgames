@@ -1,10 +1,15 @@
 
 
 def initialize(game):
-    game.size = [20,20]
-    game.colors = ["gray", "dark green", "green", "black", "red"]
+    game.size = [6,6]
+    game.resolution = 6
+    game.max_attempts = 2
+    game.max_levels = 2
+    game.colors = ["gray", "dark green", "green", "black", "red", "green", "red"]
 
 def begin(game):
+
+    print("Attempt:", game.attempt, "Level:", game.level)
 
     #if game.level == 1:
     game.body = [(0,0)]
@@ -30,6 +35,8 @@ def press_button(game, button):
         if game.fruit:
             game.current_fruit = game.fruit.pop(0)
             game.set(game.current_fruit, 4)
+        else:
+            game.win = True
 
     game.body.append(head)
 
@@ -41,7 +48,7 @@ def press_button(game, button):
     #snek()
 
     if head == (5,5):
-       game.lose()
+       game.lose = True
 
 
 
