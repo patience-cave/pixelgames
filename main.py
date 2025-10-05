@@ -16,7 +16,7 @@ class game:
         self.input({"event": "init"})
         width = self.board.size[0]
         height = self.board.size[1]
-
+        
         # ---- configurable bits ----
         self.N_COLS = width
         self.N_ROWS = height
@@ -106,11 +106,11 @@ def main():
     for r in range(game_board.N_ROWS):
         for c in range(game_board.N_COLS):
             pygame.draw.rect(screen, colors[r][c], rects[r][c])
-    
 
-    pygame.display.flip()
 
     game_board.input({"event": "begin"})
+    pygame.display.flip()
+
 
     running = True
 
@@ -168,7 +168,7 @@ def main():
             dirty.clear()
 
         if game_board.board.animations:
-            clock.tick(5)
+            clock.tick(20)
         else:
             clock.tick(60)
 

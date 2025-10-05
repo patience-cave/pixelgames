@@ -80,11 +80,14 @@
       // Load your Python modules into Pyodide’s FS
       const gridSrc  = await fetchText("./grid.py");
       const levelSrc = await fetchText("./level.py");
+      const bitpackingSrc = await fetchText("./bitpacking.py");
       pyodide.FS.writeFile("grid.py", gridSrc);
       pyodide.FS.writeFile("level.py", levelSrc);
+      pyodide.FS.writeFile("bitpacking.py", bitpackingSrc);
 
       // Define helpers in Python so JS can call straight into your board.
       await pyodide.runPythonAsync(`
+
 from grid import grid_stateful
 from level import press_button, press_tile, initialize, begin
 
