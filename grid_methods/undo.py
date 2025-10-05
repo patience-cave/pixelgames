@@ -13,6 +13,7 @@ def undo(self):
 
     self.states.pop()
     self.current_state = self.states[-1].duplicate()
+    self.current_state.move -= 1
 
 
 

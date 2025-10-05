@@ -20,6 +20,10 @@ def input(self, code):
 
     elif event == "press_button":
         self.press_button(code['button'])
+        if self.has_intended_actions():
+            self.current_state.move += 1
+            if self.current_state.move == self.current_state.max_moves:
+                self.current_state.lose = True
 
     elif event == "begin":
         self.begin()

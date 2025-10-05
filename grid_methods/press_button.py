@@ -30,7 +30,6 @@ def press_button(self, button):
 
     self.current_state = self.current_state.duplicate()
     self.current_state.event = "press_button"
-    self.current_state.move += 1
     
     self.press_button_method(self.current_state, button_state)
     

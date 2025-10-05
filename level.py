@@ -5,6 +5,7 @@ def initialize(game):
     game.resolution = 6
     game.max_attempts = 2
     game.max_levels = 2
+    game.max_moves = 27
     game.colors = ["gray", "dark green", "green", "black", "red", "green", "red"]
 
 def begin(game):

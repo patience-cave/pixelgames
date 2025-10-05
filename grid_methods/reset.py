@@ -28,7 +28,8 @@ def reset(self, _animated=True):
     else:
 
         self.lose(animated=False, use_attempt=False)
-
+        
+        # Ensure moves are set to 0 and attempts to 1 unsure lol??
         
         # self.animations = []
         # self.intended_actions = [[]]
