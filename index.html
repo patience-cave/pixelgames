@@ -64,34 +64,89 @@
     // --------------------------
     let pyodide, boardReady = false;
 
-    async function loadPython() {
-      pyodide = await loadPyodide({ stdout: console.log, stderr: console.error });
+    const time = (label) => ({
+  start: () => console.time(label),
+  end: () => console.timeEnd(label),
+});
 
-      // Make sure the browser can fetch your local files. Put grid.py and level.py
-      // right next to this HTML file (same directory).
-      // We mount the current directory as / (root) in Pyodide’s virtual FS, and fetch.
-      // For local file:// usage, most browsers allow fetch of same-dir files; if not,
-      // serve with a tiny static server (e.g., `python -m http.server`).
-      const fetchText = async (path) =>
-        (await fetch(path + `?v=${Date.now()}`, { cache: "no-store" })).text();
-      // cached option
-      // const fetchText = async (path) => (await fetch(path)).text();
+async function loadPython() {
+  const tLoad = time("loadPyodide");
+  const tWrite = time("writeFiles");
+  const tPy = time("runPython");
 
-      // Load your Python modules into Pyodide’s FS
-      const gridSrc  = await fetchText("./grid.py");
-      const levelSrc = await fetchText("./level.py");
-      const bitpackingSrc = await fetchText("./bitpacking.py");
-      pyodide.FS.writeFile("grid.py", gridSrc);
-      pyodide.FS.writeFile("level.py", levelSrc);
-      pyodide.FS.writeFile("bitpacking.py", bitpackingSrc);
+  try {
+    tLoad.start();
+    // 2) loadPyodide with stdout/stderr wired to devtools
+    pyodide = await loadPyodide({ stdout: console.log, stderr: console.error });
+    tLoad.end();
+  } catch (err) {
+    console.error("🔻 Failed during loadPyodide()", err);
+    throw err;
+  }
 
-      // Define helpers in Python so JS can call straight into your board.
-      await pyodide.runPythonAsync(`
+  // Strict fetch that throws on non-OK and logs URL + status
+  const fetchText = async (url) => {
+    const res = await fetch(url + `?v=${Date.now()}`, { cache: "no-store" });
+    if (!res.ok) {
+      throw new Error(`Fetch failed ${res.status} ${res.statusText} for ${url}`);
+    }
+    const text = await res.text();
+    if (!text.length) {
+      throw new Error(`Empty response body for ${url}`);
+    }
+    return text;
+  };
+
+  const files = ["grid", "level", "bitpacking", "state"];
+  const subfiles = [
+    "actions","begin","colors","events","get","lose","press_button","press_tile",
+    "reset","set","spotlight","undo","update","win"
+  ];
+
+  try {
+    tWrite.start();
+
+    // 3) ensure subdir exists BEFORE any nested writes
+    pyodide.FS.mkdirTree("grid_methods");
+    // pyodide.FS.writeFile("/grid_methods/__init__.py", ""); // empty is fine
+    // console.log("analyze /grid_methods:", pyodide.FS.analyzePath("/grid_methods"));
+
+
+    // Write top-level files with verification
+    for (const f of files) {
+      const src = await fetchText(`./${f}.py`);
+      pyodide.FS.writeFile(`${f}.py`, src);
+    }
+
+    // Write nested files with verification
+    for (const sf of subfiles) {
+      const src = await fetchText(`./grid_methods/${sf}.py`);
+      pyodide.FS.writeFile(`${sf}.py`, src);
+    }
+
+    // Optional: list directories to confirm layout
+    console.log("Root dir:", pyodide.FS.readdir("/"));
+    console.log("/grid_methods:", pyodide.FS.readdir("/grid_methods"));
+    tWrite.end();
+  } catch (err) {
+    console.error("🔻 Failed while writing/validating files in Pyodide FS:", err);
+    // Extra hints for common FS errors
+    if (String(err).includes("ENOENT")) {
+      console.error("Tip: path not found (missing directory or wrong relative URL). Check that grid_methods exists before writes and the fetch paths are correct.");
+    }
+    throw err;
+  }
+
+  // 4) run Python with clear tracebacks and context
+  try {
+    tPy.start();
+    await pyodide.runPythonAsync(`
+import sys
+print("sys.path:", sys.path)
 
 from grid import grid_stateful
 from level import press_button, press_tile, initialize, begin
 
-# Create and wire the board, exactly like your Python
 board = grid_stateful()
 board.begin_method = begin
 board.press_button_method = press_button
@@ -100,8 +155,7 @@ board.initialize_method = initialize
 board.input({"event": "init"})
 
 def py_get_size():
-    # board.size = (width, height)
-    return tuple(board.size)
+    return tuple(board.actual_size)
 
 def py_get_color_grid():
     return board.input("color_grid")
@@ -117,13 +171,32 @@ def py_press_button(name):
 
 def py_update():
     out = list(board.input("update"))
-    anim = bool(board.animations if hasattr(board, "animations") else getattr(board, "board", None) and getattr(board.board, "animations", False))
+    anim = bool(getattr(board, "animations", None) or (getattr(board, "board", None) and getattr(board.board, "animations", False)))
     return out, anim
-      `);
+    `);
+    tPy.end();
+  } catch (err) {
+    console.error("🔻 Python execution failed. Full traceback above from stderr.", err);
+    // Often this means an import path issue. Show some extra diagnostics:
+    try {
+      const diag = await pyodide.runPythonAsync(`
+import sys, pkgutil, os
+{
+  "cwd": os.getcwd(),
+  "sys_path": sys.path,
+  "have_grid": bool(pkgutil.find_loader("grid")),
+  "have_level": bool(pkgutil.find_loader("level")),
+  "have_grid_methods": bool(pkgutil.find_loader("grid_methods")),
+}
+`);
+      console.error("Python import diagnostics:", diag.toJs ? diag.toJs() : diag);
+    } catch {}
+    throw err;
+  }
 
-      boardReady = true;
-      document.getElementById("status").textContent = "ready";
-    }
+  boardReady = true;
+  document.getElementById("status").textContent = "ready";
+}
 
     // --------------------------
     // Canvas + layout (JS)
@@ -233,8 +306,8 @@ def py_update():
       INITIAL_SIZE = [N_COLS * BLOCK_BX, N_ROWS * BLOCK_BX];
 
       // Set canvas CSS size initially to INITIAL_SIZE, then layout
-      setCanvasCSSSize(INITIAL_SIZE[0], INITIAL_SIZE[1]);
-      layout(INITIAL_SIZE[0], INITIAL_SIZE[1]);
+      // setCanvasCSSSize(INITIAL_SIZE[0], INITIAL_SIZE[1]);
+      // layout(INITIAL_SIZE[0], INITIAL_SIZE[1]);
 
       // Pull the color grid from Python
       // Ensure conversion to plain JS arrays
@@ -243,6 +316,10 @@ def py_update():
 
       rects = buildRects();
       drawAll();
+
+      // Let the DOM finish layout, then size to the container
+      await new Promise(requestAnimationFrame);
+      resizeToContainer();
 
       // Tell Python level logic to begin (like your main())
       pyodide.runPython("py_begin()");

@@ -1,4 +1,8 @@
-from grid_methods.spotlight import spotlight_changes
+try:
+    from grid_methods.spotlight import spotlight_changes
+except:
+    from spotlight import spotlight_changes
+
 
 def lose(self, animated=True, use_attempt=True):
 
@@ -28,6 +32,7 @@ def lose(self, animated=True, use_attempt=True):
     on_level = self.current_state.level
 
     self.current_state = self.states[0].duplicate()
+    self.current_state.move = 0
     self.states = [self.states[0]]
 
     if on_attempt > self.current_state.max_attempts:

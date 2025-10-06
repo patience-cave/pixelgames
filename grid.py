@@ -130,45 +130,68 @@ class grid_stateful:
 # Importing the various methods
 # --------------------------------
 
-from grid_methods.begin import begin
+try:
+    from grid_methods.begin import begin
+    from grid_methods.colors import _state_to_color, make_color_grid
+    from grid_methods.events import input
+    from grid_methods.get import get
+    from grid_methods.lose import lose
+    from grid_methods.press_button import press_button
+    from grid_methods.press_tile import press_tile
+    from grid_methods.reset import reset
+    from grid_methods.actions import resolve_action, has_intended_actions, resolve_intended_actions, next_frame
+    from grid_methods.set import set
+    from grid_methods.undo import undo
+    from grid_methods.update import update
+    from grid_methods.win import win
+except:
+    from begin import begin
+    from colors import _state_to_color, make_color_grid
+    from events import input
+    from get import get
+    from lose import lose
+    from press_button import press_button
+    from press_tile import press_tile
+    from reset import reset
+    from actions import resolve_action, has_intended_actions, resolve_intended_actions, next_frame
+    from set import set
+    from undo import undo
+    from update import update
+    from win import win
+
+
 grid_stateful.begin = begin
 
-from grid_methods.colors import _state_to_color, make_color_grid
 grid_stateful._state_to_color = _state_to_color
 grid_stateful.make_color_grid = make_color_grid
 
-from grid_methods.events import input
 grid_stateful.input = input
 
-from grid_methods.get import get
+
 grid_stateful.get = get
 
-from grid_methods.lose import lose
+
 grid_stateful.lose = lose
 
-from grid_methods.press_button import press_button
+
 grid_stateful.press_button = press_button
 
-from grid_methods.press_tile import press_tile
+
 grid_stateful.press_tile = press_tile
 
-from grid_methods.reset import reset
+
 grid_stateful.reset = reset
 
-from grid_methods.actions import resolve_action, has_intended_actions, resolve_intended_actions, next_frame
+
 grid_stateful.resolve_action = resolve_action
 grid_stateful.has_intended_actions = has_intended_actions
 grid_stateful.resolve_intended_actions = resolve_intended_actions
 grid_stateful.next_frame = next_frame
 
-from grid_methods.set import set
 grid_stateful.set = set
 
-from grid_methods.undo import undo
 grid_stateful.undo = undo
 
-from grid_methods.update import update
 grid_stateful.update = update
 
-from grid_methods.win import win
 grid_stateful.win = win
