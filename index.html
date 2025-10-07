@@ -379,7 +379,7 @@ import sys, pkgutil, os
     // --------------------------
     // Game loop (poll updates)
     // --------------------------
-    function tick() {
+    async function tick() {
       if (boardReady) {
         // Get a PyProxy result
         const pyRes = pyodide.runPython("py_update()");
@@ -401,7 +401,12 @@ import sys, pkgutil, os
         }
         // you can use `anim` if you want to conditionally throttle
       }
+      await sleep(50);
       requestAnimationFrame(tick);
+    }
+    
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     // Kick everything off
