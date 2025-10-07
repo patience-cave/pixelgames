@@ -7,14 +7,20 @@ except:
 def win(self):
     
     speed = (max(self.actual_size[0],self.actual_size[1]) / 2) / 20
-    time = 0.5
+    time = 0.8
+    
+    print('Ok-1')
 
     # speed needs to be 0.75 seconds
     spots = spotlight_changes(self.actual_size[0], self.actual_size[1], speed / time)
 
+    win_color = self._colors["win"].index
+
+    print('Ok-2')
+
     for i in spots:
         for j in i:
-            self.set(j, "win", False)
+            self.set(j, win_color, resolution=False, fast=True)
         self.next_frame()
 
     
@@ -29,12 +35,12 @@ def win(self):
     self.current_state.attempt = 1
     self.current_state.level = on_level
 
-    for i in spots:
-        for j in i:
-            self.set(j, "empty", False)
+    # for i in spots:
+    #     for j in i:
+    #         self.set(j, 0, False)
 
     for i in self.iterate_grid():
-        self.set(i, "empty", False)
+        self.set(i, 0, resolution=False, fast=True)
 
     self.begin()
 
@@ -43,11 +49,13 @@ def win(self):
         o.append([])
         for j in i:
             o[-1].append((j, self.get(j, False)))
-            self.set(j, "win", False)
+            self.set(j, win_color, resolution=False, fast=True)
 
     for i in o:
         for j, k in i:
-            self.set(j, k, False)
+            self.set(j, k, resolution=False, fast=True)
         self.next_frame()
 
     self.states = [self.current_state]
+
+

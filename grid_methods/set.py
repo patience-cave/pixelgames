@@ -1,9 +1,7 @@
 
 
-from hmac import new
 
-
-def set(self, _position, to, resolution=True):
+def set(self, _position, to, resolution=True, fast=False):
 
     if isinstance(to, str):
         to = self._colors[to].index
@@ -20,6 +18,15 @@ def set(self, _position, to, resolution=True):
 
 
     for position in positions:
+
+        if fast:
+            self.intended_actions[-1].append({
+                "type": "change_color",
+                "position": position,
+                "to_color": to
+            })
+            continue
+
 
         previous_state = self.current_grid().get(position)
 
