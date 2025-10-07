@@ -1,17 +1,21 @@
 
 import pygame
 from grid import grid_stateful
-from level import press_button, press_tile, initialize, begin
+from level import choose_game
 
 class game:
 
     def __init__(self, margin_px=1, block_bx=10):
 
         self.board = grid_stateful()
-        self.board.begin_method = begin
-        self.board.press_button_method = press_button
-        self.board.press_tile_method = press_tile
-        self.board.initialize_method = initialize
+
+        chosen_game = choose_game("snake", self.board)
+        self.board.level = chosen_game
+
+        # self.board.begin_method = chosen_game.begin
+        # self.board.press_button_method = chosen_game.press_button
+        # self.board.press_tile_method = chosen_game.press_tile
+        # self.board.initialize_method = chosen_game.__init__
         
         self.input({"event": "init"})
         width = self.board.actual_size[0]

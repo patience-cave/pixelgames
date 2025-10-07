@@ -99,8 +99,8 @@ async function loadPython() {
 
   const files = ["grid", "level", "bitpacking", "state"];
   const subfiles = [
-    "actions","add_object",
-    "begin","colors","events","get","lose","press_button","press_tile",
+    "actions",
+    "begin","colors","events","get","lose","objects","press_button","press_tile",
     "reset","set","spotlight","undo","update","win"
   ];
 
@@ -146,13 +146,11 @@ import sys
 print("sys.path:", sys.path)
 
 from grid import grid_stateful
-from level import press_button, press_tile, initialize, begin
+from level import choose_game
 
 board = grid_stateful()
-board.begin_method = begin
-board.press_button_method = press_button
-board.press_tile_method = press_tile
-board.initialize_method = initialize
+chosen_game = choose_game("snake", board)
+board.level = chosen_game
 board.input({"event": "init"})
 
 def py_get_size():

@@ -49,3 +49,5 @@ def win(self):
         for j, k in i:
             self.set(j, k, False)
         self.next_frame()
+
+    self.states = [self.current_state]

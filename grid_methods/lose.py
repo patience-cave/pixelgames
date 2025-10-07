@@ -20,10 +20,7 @@ def lose(self, animated=True, use_attempt=True):
             self.next_frame()
 
 
-    for i in spots:
-        for j in i:
-            self.set(j, 0, False)
-
+    
 
     if use_attempt:
         on_attempt = self.current_state.attempt + 1
@@ -35,6 +32,11 @@ def lose(self, animated=True, use_attempt=True):
     self.current_state = self.states[0].duplicate()
     self.current_state.move = 0
     self.states = [self.states[0]]
+
+    for i in spots:
+        for j in i:
+            self.set(j, 0, False)
+
 
     if on_attempt > self.current_state.max_attempts:
         self.current_state.attempt = 1

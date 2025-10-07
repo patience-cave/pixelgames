@@ -24,7 +24,7 @@ def press_button(self, button):
 
     if button_state.up or button_state.down:
         button_state.dy = 1 if button_state.up else -1
-    else:
+    elif button_state.right or button_state.left:
         button_state.dx = 1 if button_state.right else -1
     
     self.current_state = self.current_state.duplicate()

@@ -18,6 +18,7 @@ def set(self, _position, to, resolution=True):
     else:
         positions = [_position]
 
+
     for position in positions:
 
         previous_state = self.current_grid().get(position)
