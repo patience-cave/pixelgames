@@ -27,9 +27,7 @@ def press_button(self, button):
     else:
         button_state.dx = 1 if button_state.right else -1
     
-    print("test button 1") # THIS IS THE CULPRIT!
     self.current_state = self.current_state.duplicate()
-    print("test button 1.5")
     self.current_state.event = "press_button"
     self.press_button_method(self.current_state, button_state)
     

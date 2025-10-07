@@ -2,7 +2,7 @@
 
 def initialize(game):
     game.size = [6,6]
-    game.resolution = 1
+    game.resolution = 6
     game.max_attempts = 2
     game.max_levels = 2
     game.max_moves = 27
@@ -34,13 +34,12 @@ def begin(game):
 
 
 def press_button(game, button):
-    print("test button 2")
+
+    print(game.move)
 
     head = game.body[-1]
 
     head = (head[0] + button.dx, head[1] + button.dy)
-
-    print(head, game.get(head))
 
     if game.get(head) not in ["empty", "fruit"]:
         return
@@ -48,7 +47,6 @@ def press_button(game, button):
     if game.get(head) == "fruit":
         if game.fruit:
             game.current_fruit = game.fruit.pop(0)
-            print(game.current_fruit)
             game.set(game.current_fruit, "fruit")
         else:
             game.win = True

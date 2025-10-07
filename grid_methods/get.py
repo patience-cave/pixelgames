@@ -46,8 +46,6 @@ def contains(self, _position, *states):
     if isinstance(found, str):
         found = [found]
 
-    print('-', s, found)
-
     for i in s:
         if i not in found:
             return False
@@ -62,8 +60,6 @@ def contains_either(self, _position, *states):
     found = special_get(self, _position)
     if isinstance(found, str):
         found = [found]
-
-    print(s, found)
 
     for i in s:
         if i in found:

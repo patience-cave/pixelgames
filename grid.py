@@ -95,7 +95,7 @@ class grid_stateful:
         initial_state.intended_actions = [[]]
 
         # these methods are not deepcopied because they are bound to the original object
-        initial_state._no_deepcopy_keys = ["set", "get", "next_frame", "add_colors", "set_background", "contains"]
+        initial_state._no_deepcopy_keys = ["set", "get", "next_frame", "add_colors", "set_background", "contains", "contains_either"]
 
 
         assert(self.current_state == None)
