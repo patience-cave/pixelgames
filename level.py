@@ -108,6 +108,7 @@ class snake_game:
             game.next_frame()
 
     def press_tile(self, game, x, y):
+        print(x, y)
         pass
 
 

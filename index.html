@@ -360,10 +360,12 @@ import sys, pkgutil, os
           drawCell(r, c);
         }
       }
-      // Draw hover border on top if there's a hovered cell
-      if (hoveredCell) {
+      // Draw hover border on top if there's a hovered cell and hover is enabled
+      if (hoveredCell && hoverEnabled) {
         drawHoverBorder(hoveredCell[0], hoveredCell[1]);
       }
+      // Draw click animations on top
+      drawClickAnimations();
     }
 
     function drawCell(r, c) {
@@ -380,6 +382,22 @@ import sys, pkgutil, os
       ctx.strokeStyle = "rgb(80, 160, 255)"; // Blue border
       ctx.lineWidth = 2;
       ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+    }
+
+    function drawClickAnimations() {
+      for (const anim of clickAnimations) {
+        const maxRadius = CELL_SIZE * 3;
+        const radius = anim.progress * maxRadius;
+        const opacity = 1 - anim.progress;
+        
+        ctx.globalAlpha = opacity;
+        ctx.strokeStyle = "rgb(80, 160, 255)";
+        ctx.lineWidth = 7;
+        ctx.beginPath();
+        ctx.arc(anim.x, anim.y, radius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
     }
 
     // --------------------------------
@@ -428,8 +446,9 @@ import sys, pkgutil, os
       // Tell Python level logic to begin (like your main())
       pyodide.runPython("py_begin()");
 
-      // Start loop
-      requestAnimationFrame(tick);
+      // Start both loops
+      gameLogicLoop();  // Game logic at 50ms intervals
+      animationLoop();  // Smooth animations at 60fps
     }
 
     // Fade in tiles with a diagonal wave pattern
@@ -473,6 +492,32 @@ import sys, pkgutil, os
       }, delay);
     }
 
+    function startClickAnimation(x, y) {
+      clickAnimations.push({
+        x: x,
+        y: y,
+        progress: 0,
+        startTime: Date.now()
+      });
+    }
+
+    function updateClickAnimations() {
+      const duration = 400; // Animation duration in ms
+      const now = Date.now();
+      
+      // Update all animations
+      for (let i = clickAnimations.length - 1; i >= 0; i--) {
+        const anim = clickAnimations[i];
+        const elapsed = now - anim.startTime;
+        anim.progress = Math.min(elapsed / duration, 1);
+        
+        // Remove completed animations
+        if (anim.progress >= 1) {
+          clickAnimations.splice(i, 1);
+        }
+      }
+    }
+
     // --------------------------
     // Event handling
     // --------------------------
@@ -497,6 +542,17 @@ import sys, pkgutil, os
       const hit = cellAt(x, y);
       if (!hit) return;
       const [r, c] = hit;
+      
+      // Start click animation at the center of the clicked cell
+      const cellRect = rects[r][c];
+      const centerX = cellRect.x + cellRect.w / 2;
+      const centerY = cellRect.y + cellRect.h / 2;
+      startClickAnimation(centerX, centerY);
+      
+      // Disable hover and clear the hovered cell
+      hoverEnabled = false;
+      hoveredCell = null;
+      
       // Send to Python: position = [c, r]
       pyodide.runPython(`py_press_tile(${c}, ${r})`);
     });
@@ -506,6 +562,11 @@ import sys, pkgutil, os
       const x = ev.clientX - rect.left;
       const y = ev.clientY - rect.top;
       const hit = cellAt(x, y);
+      
+      // Re-enable hover on mouse move
+      if (!hoverEnabled) {
+        hoverEnabled = true;
+      }
       
       // Check if hover changed
       const changed = (hoveredCell === null && hit !== null) ||
@@ -565,9 +626,9 @@ import sys, pkgutil, os
     });
 
     // --------------------------
-    // Game loop (poll updates)
+    // Game loop (poll updates from Python at 50ms intervals)
     // --------------------------
-    async function tick() {
+    async function gameLogicLoop() {
       if (boardReady) {
         // Get a PyProxy result
         const pyRes = pyodide.runPython("py_update()");
@@ -579,25 +640,30 @@ import sys, pkgutil, os
         // Free the proxy
         pyRes.destroy();
 
-        let needsRedraw = false;
         for (const u of updates) {
           if (u.result === "change_color") {
             const r = u.position[1];
             const c = u.position[0];
             colors[r][c] = u.to_color;
-            drawCell(r, c);
-            needsRedraw = true;
           }
-        }
-        
-        // Redraw hover border if any cells were updated
-        if (needsRedraw && hoveredCell) {
-          drawHoverBorder(hoveredCell[0], hoveredCell[1]);
         }
         // you can use `anim` if you want to conditionally throttle
       }
       await sleep(50);
-      requestAnimationFrame(tick);
+      gameLogicLoop();
+    }
+
+    // --------------------------
+    // Animation loop (runs at 60fps for smooth animations)
+    // --------------------------
+    function animationLoop() {
+      // Update click animations
+      updateClickAnimations();
+      
+      // Always redraw to keep animations smooth
+      drawAll();
+      
+      requestAnimationFrame(animationLoop);
     }
     
     function sleep(ms) {
