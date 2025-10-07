@@ -374,6 +374,12 @@ import sys, pkgutil, os
       ctx.globalAlpha = opacity;
       ctx.fillStyle = rgbStr(colors[r][c]);
       ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+      
+      // Draw very faint border around each tile
+      ctx.strokeStyle = "rgba(80, 80, 80, 0.15)";
+      ctx.lineWidth = 0.5;
+      ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+      
       ctx.globalAlpha = 1;
     }
 
