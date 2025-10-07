@@ -7,6 +7,7 @@ class moves_left:
             "unused move": "orange",
             "used move": "dark red"
         }
+        game.protected_colors += ["used move", "unused move"]
         self.on_move = 0
 
     def render(self, game):
@@ -31,6 +32,7 @@ class moves_left:
     def use_move(self, game):
         if self.on_move >= len(self.positions):
             return
+        
         positions = self.positions[self.on_move]
         for i in positions:
             game.set(i[0], "used move", resolution=False)
@@ -38,50 +40,65 @@ class moves_left:
 
         self.on_move += 1
 
-class patrol:
-    def __init__(self, game, position, dx, dy):
-        self.id = "patrol"
+
+
+class patrols:
+    def __init__(self, game, _patrols):
+        self.id = "patrols"
         self.colors = {
             "patrol body": "orange",
             "patrol eye": "dark red"
         }
-        self.position = position
-        self.dx = dx
-        self.dy = dy
+        self.patrols = _patrols
+        # self.position = position
+        # self.dx = dx
+        # self.dy = dy
 
     def render(self, game):
-        for i in [(0,0), (0,-1), (0,1), (1,-1), (-1,1), (-1,0), (-1,-1), (1,0), (1,1)]:
-            game.set((self.position[0]+i[0], self.position[1]+i[1]), "patrol body")
-        
-        game.set([self.position[0]+self.dx, self.position[1]+self.dy], "patrol eye")
+
+        for patrol in self.patrols:
+            position = patrol["position"]
+            dx = patrol["dx"]
+            dy = patrol["dy"]
+            for i in [(0,0), (0,-1), (0,1), (1,-1), (-1,1), (-1,0), (-1,-1), (1,0), (1,1)]:
+                game.set((position[0]+i[0], position[1]+i[1]), "patrol body")
+            
+            game.set([position[0]+dx, position[1]+dy], "patrol eye")
     
     def move(self, game):
-        if self.check_collision(game):
-            self.flip(game)
-        else:
+        for patrol in self.patrols:
+            position = patrol["position"]
+            dx = patrol["dx"]
+            dy = patrol["dy"]
 
-            if self.dx != 0:
-                for i in [-1, 0, 1]:
-                    game.set((self.position[0]-self.dx, self.position[1]+i), "floor")
-            if self.dy != 0:
-                for i in [-1, 0, 1]:
-                    game.set((self.position[0]+i, self.position[1]-self.dy), "floor")
+            if self.check_collision(game, patrol):
+                self.flip(game, patrol)
+            else:
 
-            self.position = (self.position[0]+self.dx, self.position[1]+self.dy)
-            self.render(game)
+                if dx != 0:
+                    for i in [-1, 0, 1]:
+                        game.set((position[0]-dx, position[1]+i), "floor")
+                if dy != 0:
+                    for i in [-1, 0, 1]:
+                        game.set((position[0]+i, position[1]-dy), "floor")
 
-            if self.check_collision(game):
-                self.flip(game)
+                patrol["position"] = (position[0]+dx, position[1]+dy)
+                self.render(game)
 
-    def check_collision(self, game):
+                if self.check_collision(game, patrol):
+                    self.flip(game, patrol)
+
+
+    def check_collision(self, game, patrol):
+        position, dx, dy = patrol["position"], patrol["dx"], patrol["dy"]
 
         edge_positions = set()
-        if self.dx != 0:
+        if dx != 0:
             for i in [-1, 0, 1]:
-                edge_positions.add((self.position[0]+self.dx+self.dx, self.position[1]+i))
-        if self.dy != 0:
+                edge_positions.add((position[0]+dx+dx, position[1]+i))
+        if dy != 0:
             for i in [-1, 0, 1]:
-                edge_positions.add((self.position[0]+i, self.position[1]+self.dy+self.dy))
+                edge_positions.add((position[0]+i, position[1]+dy+dy))
 
         print(edge_positions)
         for position in edge_positions:
@@ -90,11 +107,12 @@ class patrol:
                 return True
         return False
     
-    def flip(self, game):
-        game.set([self.position[0]+self.dx, self.position[1]+self.dy], "patrol body")
-        self.dx = -self.dx
-        self.dy = -self.dy
-        game.set([self.position[0]+self.dx, self.position[1]+self.dy], "patrol eye")
+    def flip(self, game, patrol):
+        position, dx, dy = patrol["position"], patrol["dx"], patrol["dy"]
+        game.set([position[0]+dx, position[1]+dy], "patrol body")
+        patrol["dx"] = -dx
+        patrol["dy"] = -dy
+        game.set([position[0]+dx, position[1]+dy], "patrol eye")
 
 
 
@@ -108,11 +126,16 @@ class border:
         }
         self.initial_direction = initial_direction
 
+        self.left = game.origin[0] - 1
+        self.right = game.origin[0] + game.board_size[0]
+        self.bottom = game.origin[1] - 1
+        self.top = game.origin[1] + game.board_size[1]
+
     def render(self, game):
-        game.set((1,1), "corner")
-        game.set((1,14), "corner")
-        game.set((14,1), "corner")
-        game.set((14,14), "corner")
+        game.set((self.left, self.bottom), "corner")
+        game.set((self.left, self.top), "corner")
+        game.set((self.right, self.bottom), "corner")
+        game.set((self.right, self.top), "corner")
 
         dir = self.initial_direction
         self.direction(game, "")
@@ -125,20 +148,25 @@ class border:
         
         self.initial_direction = dir
 
-        for i in range(2,14):
-            game.set((i,1), "inactive border")
-            game.set((i,14), "inactive border")
-            game.set((1,i), "inactive border")
-            game.set((14,i), "inactive border")
+        for i in range(self.left+1,self.right):
+            game.set((i,self.bottom), "inactive border")
+            game.set((i,self.top), "inactive border")
+
+            if dir == "up":
+                game.set((i,self.top), "active border")
+            elif dir == "down":
+                game.set((i,self.bottom), "active border")
+
+        for i in range(self.bottom+1,self.top):
+            game.set((self.left,i), "inactive border")
+            game.set((self.right,i), "inactive border")
 
             if dir == "right":
-                game.set((14,i), "active border")
+                game.set((self.right,i), "active border")
             elif dir == "left":
-                game.set((1,i), "active border")
-            elif dir == "up":
-                game.set((i,14), "active border")
-            elif dir == "down":
-                game.set((i,1), "active border")
+                game.set((self.left,i), "active border")
+
+            
 
 
 class floor:
@@ -149,8 +177,8 @@ class floor:
         }
 
     def render(self, game):
-        for i in range(2,14):
-            for j in range(2,14):
+        for i in range(game.origin[0],game.origin[0]+game.board_size[0]):
+            for j in range(game.origin[1],game.origin[1]+game.board_size[1]):
                 game.set((i,j), "floor")
 
 
@@ -159,35 +187,39 @@ class walls:
         self.id = "walls"
         self.colors = {
             "wall": "dark gray",
-            "white wall": "white"
+            "wall-white": "white",
+            "wall-cyan": "cyan",
+            "wall-pink": "pink"
         }
-        self.walls = []
-        self.white_walls = []
-        y = 13
+        self.walls = {}
+        for i in self.colors:
+            self.walls[i] = []
+        y = game.board_size[1] + game.origin[1] - 1
+        print(y)
         for i in positions:
-            x = 2
+            x = game.origin[0]
             for j in i:
-                if j == "x":
-                    self.walls.append((x, y))
-                if j == "o":
-                    self.white_walls.append((x, y))
+                if j == "x": self.walls["wall"].append((x, y))
+                if j == "o": self.walls["wall-white"].append((x, y))
+                if j == "c": self.walls["wall-cyan"].append((x, y))
+                if j == "p": self.walls["wall-pink"].append((x, y))
                 x += 1
             y -= 1
 
     def render(self, game):
-        for position in self.walls:
-            game.set(position, "wall")
 
-        for position in self.white_walls:
-            game.set(position, "white wall")
-
+        for i in self.walls:
+            for position in self.walls[i]:
+                game.set(position, i)
 
 class players:
     def __init__(self, game, player_data):
         self.id = "players"
         self.colors = {
-            "player-1": "red",
-            "player-2": "yellow"
+            "player-red": "red",
+            "player-yellow": "yellow",
+            "player-cyan": "cyan",
+            "player-pink": "pink",
         }
         self.player_data = player_data
 
@@ -200,6 +232,7 @@ class players:
     def move(self, game, dx, dy):
 
         original_positions = { i["player"]: i["position"] for i in self.player_data }
+        looped_players = []
 
         while True:
 
@@ -226,14 +259,17 @@ class players:
                 if new_position[1] == 1: new_position[1] = 13
                 if new_position[1] == 14: new_position[1] = 2
 
-                if new_position == original_positions[id]:
+                if id in looped_players:
                     continue
-                if game.get(new_position) in ["wall", "white wall"]:
+                if new_position == original_positions[id]:
+                    looped_players.append(id)
+                
+                if game.get(new_position).startswith("wall"):
                     continue
                 if game.get(new_position).startswith("patrol"):
                     game.lose = True
                     continue
-                if game.get(new_position).startswith("player-"):
+                if game.get(new_position).startswith("player"):
                     continue
 
                 game.set(previous_position, "floor")
@@ -271,16 +307,19 @@ class ever_maze:
 
     def initialize_objects(self, game):
 
-        if game.level == 3:
+        if game.level == 1:
             game.max_moves = 15
+            game.origin = (2,2)
+            game.board_size = (12,12)
             self.previous_button = "up"
             game.add_objects([
                 moves_left(game),
                 border(game, initial_direction=self.previous_button),
                 floor(game),
+                patrols(game, []),
                 players(game, [
                     {
-                        "player": 1,
+                        "player": "red",
                         "position": (10,11),
                         "end": (6,5)
                     }
@@ -307,9 +346,10 @@ class ever_maze:
                 moves_left(game),
                 border(game, initial_direction=self.previous_button),
                 floor(game),
+                patrols(game, []),
                 players(game, [
                     {
-                        "player": 2,
+                        "player": "yellow",
                         "position": (11,8),
                         "end": (4,5)
                     }
@@ -329,17 +369,25 @@ class ever_maze:
                     "............",
                 ])
             ])
-        elif game.level == 1:
+        elif game.level == 3:
             game.max_moves = 18
+            game.origin = (2,2)
+            game.board_size = (12,12)
             self.previous_button = "up"
             game.add_objects([
                 moves_left(game),
                 border(game, initial_direction=self.previous_button),
                 floor(game),
-                patrol(game, (5,12), 1, 0),
+                patrols(game, [
+                    {
+                        "position": (5,12),
+                        "dx": 1,
+                        "dy": 0
+                    }
+                ]),
                 players(game, [
                     {
-                        "player": 2,
+                        "player": "yellow",
                         "position": (6,9),
                         "end": (7,3)
                     }
@@ -359,6 +407,43 @@ class ever_maze:
                     "............",
                 ])
             ])
+        elif game.level >= 4:
+            game.max_moves = 18
+            game.origin = (1,2)
+            game.board_size = (14,12)
+            self.previous_button = "down"
+            game.add_objects([
+                moves_left(game),
+                border(game, initial_direction=self.previous_button),
+                floor(game),
+                patrols(game, []),
+                players(game, [
+                    {
+                        "player": "cyan",
+                        "position": (8,5),
+                        "end": (3,6)
+                    },
+                    {
+                        "player": "pink",
+                        "position": (5,9),
+                        "end": (5,3)
+                    }
+                ]),
+                walls(game, [
+                    "..............",
+                    "...x....xx....",
+                    "..xx.....xx...",
+                    "..............",
+                    "..xx.....x....",
+                    "..xxx...xx.x..",
+                    ".oo.......xxx.",
+                    ".c.........x..",
+                    ".oo...x....x..",
+                    "...opoxx..xxx.",
+                    "...o.o.....x..",
+                    ".............."
+                ])
+            ])
 
     def begin(self, game):
         self.initialize_objects(game)
@@ -368,15 +453,15 @@ class ever_maze:
 
     def press_button(self, game, button):
         
-        if button.name == self.previous_button:
-            return
+        #if button.name == self.previous_button:
+        #    return
         
         if button.name not in ["up", "down", "left", "right"]:
             return
         
         self.previous_button = button.name
 
-        for patrol in game.find_all("patrol"):
+        for patrol in game.find_all("patrols"):
             patrol.move(game)
         
         game.find_object("border").direction(game, button.name)

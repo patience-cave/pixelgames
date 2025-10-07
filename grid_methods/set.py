@@ -30,6 +30,12 @@ def set(self, _position, to, resolution=True, fast=False):
 
         previous_state = self.current_grid().get(position)
 
+        if previous_state in self._protected_colors:
+            if to > 2 and to not in self._protected_colors:
+                continue
+
+        # if you are trying to write over a "used move" or "unused move" ... return
+
         if self.current_grid().set(position, to):
 
             new_state = self.current_grid().get(position)

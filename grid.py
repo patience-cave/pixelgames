@@ -1,4 +1,3 @@
-from mimetypes import init
 from bitpacking import grid
 from state import State
 
@@ -20,9 +19,11 @@ class grid_stateful:
         self._colors = {
             "empty": State({"index": 0, "name": "black", "rgb": (0,0,0)}),
             "win": State({"index": 1, "name": "green", "rgb": (0,255,0)}),
-            "lose": State({"index": 2, "name": "red", "rgb": (255,0,0)})
+            "lose": State({"index": 2, "name": "red", "rgb": (255,0,0)}),
         }
         self._color_map = ["empty", "win", "lose"]
+        self._protected_colors = {0}
+        self._protected_colors.remove(0)
 
         # --------------------------------
         # Game States, Actions, and Animations
@@ -93,6 +94,7 @@ class grid_stateful:
 
         initial_state.objects = []
         initial_state.add_objects = self.add_objects
+        initial_state.protected_colors = []
 
         initial_state.next_frame = self.next_frame
         initial_state.move = 0
@@ -113,7 +115,7 @@ class grid_stateful:
             "contains", "contains_either",
             "find_object", "find_all",
             "add_objects", "is_modified"
-            ]
+        ]
 
 
         assert(self.current_state == None)
