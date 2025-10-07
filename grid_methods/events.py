@@ -19,7 +19,9 @@ def input(self, code):
         self.press_tile(code['position'])
 
     elif event == "press_button":
+        print("test button start")
         self.press_button(code['button'])
+        print("test button end")
         if self.has_intended_actions():
             self.current_state.move += 1
             if self.current_state.move == self.current_state.max_moves:

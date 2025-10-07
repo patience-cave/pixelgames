@@ -10,12 +10,13 @@ def lose(self, animated=True, use_attempt=True):
     time = 0.3
 
     spots = spotlight_changes(self.actual_size[0], self.actual_size[1], speed / time )
+    lose_color = self._colors["lose"].index
 
     if animated:
 
         for i in spots[::-1]:
             for j in i:
-                self.set(j, 6, False)
+                self.set(j, lose_color, False)
             self.next_frame()
 
 
@@ -52,7 +53,7 @@ def lose(self, animated=True, use_attempt=True):
         o.append([])
         for j in i:
             o[-1].append((j, self.get(j, False)))
-            self.set(j, 6, False)
+            self.set(j, lose_color, False)
 
     
     for i in o[::-1]:

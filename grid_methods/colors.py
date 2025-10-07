@@ -1,3 +1,4 @@
+from state import State
 
 _color_to_rgb = {
     "black": (0, 0, 0),
@@ -13,8 +14,46 @@ _color_to_rgb = {
 }
 
 
+def set_background(self, color):
+    if color in _color_to_rgb:
+        self._colors['empty'] = State({"index": 0, "name": color, "rgb": _color_to_rgb[color]})
+
+
+
+def add_colors(self, colors):
+
+    current_index = 0
+    if self._color_map is not None:
+        current_index = len(self._color_map)
+    
+    for color in colors:
+
+        if color in self._colors:
+            continue
+            
+        s = State()
+        s.index = current_index
+        current_index += 1
+        s.name = color
+        s.rgb = self._state_to_color(colors[color])
+        self._colors[color] = s
+
+        self._color_map.append(color)
+    
+
+
+
 def _state_to_color(self, state):
-    return _color_to_rgb[self.colors[state]]
+    if isinstance(state, str):
+        if state in _color_to_rgb:
+            return _color_to_rgb[state]
+        else:
+            return (255, 255, 255)
+    elif isinstance(state, int):
+        return self._colors[self._color_map[state]].rgb
+
+    return state
+
 
 
 def make_color_grid(self):

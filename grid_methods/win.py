@@ -14,7 +14,7 @@ def win(self):
 
     for i in spots:
         for j in i:
-            self.set(j, 5, False)
+            self.set(j, "win", False)
         self.next_frame()
 
     
@@ -31,10 +31,10 @@ def win(self):
 
     for i in spots:
         for j in i:
-            self.set(j, 0, False)
+            self.set(j, "empty", False)
 
     for i in self.iterate_grid():
-        self.set(i, 0, False)
+        self.set(i, "empty", False)
 
     self.begin()
 
@@ -43,7 +43,7 @@ def win(self):
         o.append([])
         for j in i:
             o[-1].append((j, self.get(j, False)))
-            self.set(j, 5, False)
+            self.set(j, "win", False)
 
     for i in o:
         for j, k in i:

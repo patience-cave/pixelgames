@@ -15,7 +15,9 @@ class grid_stateful:
         self.size = None
         self.actual_size = None
         self.resolution = None
-        self.colors = None
+        
+        self._colors = None
+        self._color_map = None
 
         # --------------------------------
         # Game States, Actions, and Animations
@@ -62,11 +64,24 @@ class grid_stateful:
         initial_state = self.states[0]
 
         initial_state.set = self.set
-        initial_state.get = self.get
+        initial_state.get = self.special_get
         initial_state.size = [8,8]
         initial_state.resolution = [1, 1]
         initial_state.actual_size = [8,8]
-        initial_state.colors = ["black", "white"]
+
+        # initial_state.objects = []
+        self._colors = {
+            "empty": State({"index": 0, "name": "black", "rgb": (0,0,0)}),
+            "win": State({"index": 1, "name": "green", "rgb": (0,255,0)}),
+            "lose": State({"index": 2, "name": "red", "rgb": (255,0,0)})
+        }
+        self._color_map = ["empty", "win", "lose"]
+
+        initial_state.add_colors = self.add_colors
+        initial_state.set_background = self.set_background
+        initial_state.contains = self.contains
+        initial_state.contains_either = self.contains_either
+
         initial_state.next_frame = self.next_frame
         initial_state.move = 0
         initial_state.win = False
@@ -80,8 +95,11 @@ class grid_stateful:
         initial_state.intended_actions = [[]]
 
         # these methods are not deepcopied because they are bound to the original object
-        initial_state._no_deepcopy_keys = ["set", "get", "next_frame"]
+        initial_state._no_deepcopy_keys = ["set", "get", "next_frame", "add_colors", "set_background", "contains"]
 
+
+        assert(self.current_state == None)
+        self.current_state = initial_state
 
         # if no initialize method is set, the default values will remain
         if self.initialize_method != None:
@@ -95,16 +113,15 @@ class grid_stateful:
 
         # ensure size and colors are public variables
         self.size = initial_state.size
-        self.colors = initial_state.colors
         self.resolution = initial_state.resolution
         self.actual_size = initial_state.actual_size
 
-        assert(self.current_state == None)
+        # self._colors = initial_state._colors
+        # self._color_map = initial_state._color_map
 
-        symbols = len(self.colors)
+        symbols = len(self._color_map)
         initial_state.grid = grid(self.actual_size, symbols)
 
-        self.current_state = initial_state
 
 
     def iterate_grid(self):
@@ -123,18 +140,16 @@ class grid_stateful:
         return self.states[-1].grid
 
 
-
-
-
 # --------------------------------
 # Importing the various methods
 # --------------------------------
 
 try:
     from grid_methods.begin import begin
-    from grid_methods.colors import _state_to_color, make_color_grid
+    from grid_methods.add_object import add_object, get_object
+    from grid_methods.colors import _state_to_color, make_color_grid, add_colors, set_background
     from grid_methods.events import input
-    from grid_methods.get import get
+    from grid_methods.get import get, contains, special_get, contains_either
     from grid_methods.lose import lose
     from grid_methods.press_button import press_button
     from grid_methods.press_tile import press_tile
@@ -146,9 +161,10 @@ try:
     from grid_methods.win import win
 except:
     from begin import begin
-    from colors import _state_to_color, make_color_grid
+    from add_object import add_object, get_object
+    from colors import _state_to_color, make_color_grid, add_colors, set_background
     from events import input
-    from get import get
+    from get import get, contains, special_get, contains_either
     from lose import lose
     from press_button import press_button
     from press_tile import press_tile
@@ -162,26 +178,28 @@ except:
 
 grid_stateful.begin = begin
 
+grid_stateful.add_object = add_object
+grid_stateful.get_object = get_object
+
 grid_stateful._state_to_color = _state_to_color
 grid_stateful.make_color_grid = make_color_grid
+grid_stateful.add_colors = add_colors
+grid_stateful.set_background = set_background
 
 grid_stateful.input = input
 
-
 grid_stateful.get = get
-
+grid_stateful.contains = contains
+grid_stateful.special_get = special_get
+grid_stateful.contains_either = contains_either
 
 grid_stateful.lose = lose
 
-
 grid_stateful.press_button = press_button
-
 
 grid_stateful.press_tile = press_tile
 
-
 grid_stateful.reset = reset
-
 
 grid_stateful.resolve_action = resolve_action
 grid_stateful.has_intended_actions = has_intended_actions

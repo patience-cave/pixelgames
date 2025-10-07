@@ -5,6 +5,9 @@ from hmac import new
 
 def set(self, _position, to, resolution=True):
 
+    if isinstance(to, str):
+        to = self._colors[to].index
+
     positions = []
 
     if resolution:

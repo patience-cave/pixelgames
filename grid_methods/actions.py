@@ -20,7 +20,7 @@ def resolve_action(self, a, isundo=False):
         if isundo:
             self.current_grid().set(a["position"], a["from_color"])
             a["from_color"], a["to_color"] = a["to_color"], a["from_color"]
-
+        
         return [[{
             "result": "change_color",
             "position": a["position"],
