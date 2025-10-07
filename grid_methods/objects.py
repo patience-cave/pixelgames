@@ -8,11 +8,17 @@ def add_objects(self, objects):
     self.current_state.objects += objects
 
 
-def find_all(type_name, items):
+def find_all(self, type_name):
+    items = self.current_state.objects
     # Get the actual class object from the built-in namespace
-    return [item for item in items if item.id == type_name]
+    found = []
+    for item in items:
+        if item.id == type_name:
+            found.append(item)
+    return found
+    #return [item for item in items if item.id == type_name]
 
 def find_object(self, name):
-    o = find_all(name, self.current_state.objects)
+    o = self.find_all(name)
     return o[0]
 

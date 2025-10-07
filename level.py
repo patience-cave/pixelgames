@@ -38,6 +38,64 @@ class moves_left:
 
         self.on_move += 1
 
+class patrol:
+    def __init__(self, game, position, dx, dy):
+        self.id = "patrol"
+        self.colors = {
+            "patrol body": "orange",
+            "patrol eye": "dark red"
+        }
+        self.position = position
+        self.dx = dx
+        self.dy = dy
+
+    def render(self, game):
+        for i in [(0,0), (0,-1), (0,1), (1,-1), (-1,1), (-1,0), (-1,-1), (1,0), (1,1)]:
+            game.set((self.position[0]+i[0], self.position[1]+i[1]), "patrol body")
+        
+        game.set([self.position[0]+self.dx, self.position[1]+self.dy], "patrol eye")
+    
+    def move(self, game):
+        if self.check_collision(game):
+            self.flip(game)
+        else:
+
+            if self.dx != 0:
+                for i in [-1, 0, 1]:
+                    game.set((self.position[0]-self.dx, self.position[1]+i), "floor")
+            if self.dy != 0:
+                for i in [-1, 0, 1]:
+                    game.set((self.position[0]+i, self.position[1]-self.dy), "floor")
+
+            self.position = (self.position[0]+self.dx, self.position[1]+self.dy)
+            self.render(game)
+
+            if self.check_collision(game):
+                self.flip(game)
+
+    def check_collision(self, game):
+
+        edge_positions = set()
+        if self.dx != 0:
+            for i in [-1, 0, 1]:
+                edge_positions.add((self.position[0]+self.dx+self.dx, self.position[1]+i))
+        if self.dy != 0:
+            for i in [-1, 0, 1]:
+                edge_positions.add((self.position[0]+i, self.position[1]+self.dy+self.dy))
+
+        print(edge_positions)
+        for position in edge_positions:
+            print(position, game.get(position))
+            if game.get(position) not in ["floor"]:
+                return True
+        return False
+    
+    def flip(self, game):
+        game.set([self.position[0]+self.dx, self.position[1]+self.dy], "patrol body")
+        self.dx = -self.dx
+        self.dy = -self.dy
+        game.set([self.position[0]+self.dx, self.position[1]+self.dy], "patrol eye")
+
 
 
 class border:
@@ -172,6 +230,9 @@ class players:
                     continue
                 if game.get(new_position) in ["wall", "white wall"]:
                     continue
+                if game.get(new_position).startswith("patrol"):
+                    game.lose = True
+                    continue
                 if game.get(new_position).startswith("player-"):
                     continue
 
@@ -210,11 +271,12 @@ class ever_maze:
 
     def initialize_objects(self, game):
 
-        if game.level == 1:
+        if game.level == 3:
             game.max_moves = 15
+            self.previous_button = "up"
             game.add_objects([
                 moves_left(game),
-                border(game, initial_direction="up"),
+                border(game, initial_direction=self.previous_button),
                 floor(game),
                 players(game, [
                     {
@@ -238,11 +300,12 @@ class ever_maze:
                     "............",
                 ])
             ])
-        elif game.level >= 2:
+        elif game.level == 2:
             game.max_moves = 12
+            self.previous_button = "left"
             game.add_objects([
                 moves_left(game),
-                border(game, initial_direction="left"),
+                border(game, initial_direction=self.previous_button),
                 floor(game),
                 players(game, [
                     {
@@ -266,6 +329,36 @@ class ever_maze:
                     "............",
                 ])
             ])
+        elif game.level == 1:
+            game.max_moves = 18
+            self.previous_button = "up"
+            game.add_objects([
+                moves_left(game),
+                border(game, initial_direction=self.previous_button),
+                floor(game),
+                patrol(game, (5,12), 1, 0),
+                players(game, [
+                    {
+                        "player": 2,
+                        "position": (6,9),
+                        "end": (7,3)
+                    }
+                ]),
+                walls(game, [
+                    "........x...",
+                    "............",
+                    "............",
+                    "...xx.xx....",
+                    "...x...x....",
+                    "...x......x.",
+                    "......xx..x.",
+                    ".xx.........",
+                    ".x..x.......",
+                    "....ooo..xx.",
+                    "....o.o.....",
+                    "............",
+                ])
+            ])
 
     def begin(self, game):
         self.initialize_objects(game)
@@ -274,8 +367,17 @@ class ever_maze:
         pass
 
     def press_button(self, game, button):
+        
+        if button.name == self.previous_button:
+            return
+        
         if button.name not in ["up", "down", "left", "right"]:
             return
+        
+        self.previous_button = button.name
+
+        for patrol in game.find_all("patrol"):
+            patrol.move(game)
         
         game.find_object("border").direction(game, button.name)
         game.find_object("players").move(game, button.dx, button.dy)

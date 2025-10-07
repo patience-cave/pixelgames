@@ -7,7 +7,7 @@ except:
 def lose(self, animated=True, use_attempt=True):
 
     speed = (max(self.actual_size[0],self.actual_size[1]) / 2) / 20
-    time = 0.3
+    time = 0.4
 
     spots = spotlight_changes(self.actual_size[0], self.actual_size[1], speed / time )
     lose_color = self._colors["lose"].index
