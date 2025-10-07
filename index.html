@@ -22,10 +22,29 @@
     .status { opacity: 0.8; font-size: 0.9rem; }
     #container {
       position: absolute; inset: 0;
-      display: grid; grid-template-rows: auto 1fr;
+      display: flex;
+      flex-direction: column;
+    }
+    #game-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      gap: 20px;
+      overflow: hidden;
     }
     #stage-wrap {
-      position: relative; overflow: hidden;
+      position: relative;
+      max-width: 600px;
+      max-height: 450px;
+      width: 100%;
+      aspect-ratio: 4/3;
+      border: 2px solid #2a2a2a;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #0a0a0a;
     }
     canvas {
       display: block;
@@ -33,8 +52,59 @@
       image-rendering: pixelated;
       cursor: pointer;
     }
-    .keys { margin-left: auto; display: flex; gap: 8px; }
-    kbd { background: #2b2b2b; padding: 2px 6px; border-radius: 6px; border: 1px solid #3b3b3b; }
+    #controls {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .arrow-pad {
+      display: grid;
+      grid-template-areas:
+        ". up ."
+        "left down right";
+      gap: 4px;
+      grid-template-columns: repeat(3, 60px);
+      grid-template-rows: repeat(2, 60px);
+    }
+    .control-btn {
+      background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%);
+      border: 2px solid #4a4a4a;
+      border-radius: 8px;
+      color: #eaeaea;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+    }
+    .control-btn:hover {
+      background: linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 100%);
+      border-color: #5a5a5a;
+      transform: translateY(-2px);
+    }
+    .control-btn:active {
+      background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+      border-color: #3a3a3a;
+      transform: translateY(0);
+    }
+    .arrow-btn {
+      width: 60px;
+      height: 60px;
+    }
+    #btn-up { grid-area: up; }
+    #btn-left { grid-area: left; }
+    #btn-down { grid-area: down; }
+    #btn-right { grid-area: right; }
+    .action-btn {
+      width: 100px;
+      height: 60px;
+      font-size: 1rem;
+    }
     a { color: #8ac6ff; text-decoration: none; }
     a:hover { text-decoration: underline; }
   </style>
@@ -46,15 +116,22 @@
     <header>
       <strong>Tap a Block to Turn It White</strong>
       <span class="status" id="status">loading Python…</span>
-      <div class="keys">
-        <span class="status">keys:</span>
-        <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>
-        <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd>
-        <kbd>Space</kbd><kbd>Enter</kbd><kbd>0</kbd>
-      </div>
     </header>
-    <div id="stage-wrap">
-      <canvas id="stage"></canvas>
+    <div id="game-area">
+      <div id="stage-wrap">
+        <canvas id="stage"></canvas>
+      </div>
+      <div id="controls">
+        <div class="arrow-pad">
+          <button class="control-btn arrow-btn" id="btn-up">↑</button>
+          <button class="control-btn arrow-btn" id="btn-left">←</button>
+          <button class="control-btn arrow-btn" id="btn-down">↓</button>
+          <button class="control-btn arrow-btn" id="btn-right">→</button>
+        </div>
+        <button class="control-btn action-btn" id="btn-space">Space</button>
+        <button class="control-btn action-btn" id="btn-undo">Undo</button>
+        <button class="control-btn action-btn" id="btn-reset">Reset</button>
+      </div>
     </div>
   </div>
 
@@ -374,6 +451,24 @@ import sys, pkgutil, os
       if (!button || !boardReady) return;
       ev.preventDefault();
       pyodide.runPython(`py_press_button("${button}")`);
+    });
+
+    // Control button event listeners
+    const controlButtons = {
+      "btn-up": "up",
+      "btn-down": "down",
+      "btn-left": "left",
+      "btn-right": "right",
+      "btn-space": "space",
+      "btn-undo": "undo",
+      "btn-reset": "reset"
+    };
+
+    Object.entries(controlButtons).forEach(([id, action]) => {
+      document.getElementById(id).addEventListener("click", () => {
+        if (!boardReady) return;
+        pyodide.runPython(`py_press_button("${action}")`);
+      });
     });
 
     // --------------------------
