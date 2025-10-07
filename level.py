@@ -1,12 +1,13 @@
 
 class border:
-    def __init__(self, game):
+    def __init__(self, game, initial_direction='up'):
         self.id = "border"
         self.colors = {
             "corner": "dark gray",
             "active border": "green",
             "inactive border": "light gray"
         }
+        self.initial_direction = initial_direction
 
     def render(self, game):
         game.set((1,1), "corner")
@@ -14,11 +15,13 @@ class border:
         game.set((14,1), "corner")
         game.set((14,14), "corner")
 
-        for i in range(2,14):
-            game.set((i,1), "inactive border")
-            game.set((i,14), "active border")
-            game.set((1,i), "inactive border")
-            game.set((14,i), "inactive border")
+        dx = 0
+        dy = 0
+        if self.initial_direction == "up": dy = 1
+        if self.initial_direction == "down": dy = -1
+        if self.initial_direction == "left": dx = -1
+        if self.initial_direction == "right": dx = 1
+        self.direction(game, dx, dy)
 
     def direction(self, game, dx, dy):
         for i in range(2,14):
@@ -122,12 +125,12 @@ class players:
                 id = player["player"]
 
                 previous_position = player["position"]
-                new_position = (previous_position[0] + dx, previous_position[1] + dy)
+                new_position = [previous_position[0] + dx, previous_position[1] + dy]
 
-                if new_position[0] == 2: new_position[0] = 13
-                if new_position[0] == 13: new_position[0] = 2
-                if new_position[1] == 2: new_position[1] = 13
-                if new_position[1] == 13: new_position[1] = 2
+                if new_position[0] == 1: new_position[0] = 13
+                if new_position[0] == 14: new_position[0] = 2
+                if new_position[1] == 1: new_position[1] = 13
+                if new_position[1] == 14: new_position[1] = 2
 
                 if new_position == original_positions[id]:
                     continue
@@ -151,9 +154,10 @@ class players:
         # check if all players have reached the end
         game_win = True
         for player in self.player_data:
-            if player["position"] != player["end"]:
-                game_win = False
-                break
+            for i in zip(player["position"], player["end"]):
+                if i[0] != i[1]:
+                    game_win = False
+                    break
 
         if game_win:
             game.win = True
@@ -169,30 +173,61 @@ class ever_maze:
         game.set_background("gray")
 
     def initialize_objects(self, game):
-        game.add_objects([
-            border(game),
-            floor(game),
-            players(game, [
-                {
-                    "player": 1,
-                    "position": (10,11),
-                    "end": (6,5)
-                }
-            ]),
-            walls(game, [
-                "......xx..x.",
-                ".x.....xxx..",
-                "..xx..xx.x..",
-                "..xxx.......",
-                ".xxxxx......",
-                "..xx.....x..",
-                ".......xxx..",
-                ".......xxx..",
-                "...o.o..x.x.",
-                "...ooo......",
-                "............"
+
+        if game.level == 1:
+            game.max_moves = 15
+            game.add_objects([
+                border(game, initial_direction="up"),
+                floor(game),
+                players(game, [
+                    {
+                        "player": 1,
+                        "position": (10,11),
+                        "end": (6,5)
+                    }
+                ]),
+                walls(game, [
+                    "......xx..x.",
+                    ".x.....xxx..",
+                    "..xx..xx.x..",
+                    "..xxx.......",
+                    ".xxxxx......",
+                    "..xx.....x..",
+                    ".......xxx..",
+                    ".......xxx..",
+                    "...o.o..x.x.",
+                    "...ooo......",
+                    "............",
+                    "............",
+                ])
             ])
-        ])
+        elif game.level >= 2:
+            game.max_moves = 12
+            game.add_objects([
+                border(game, initial_direction="left"),
+                floor(game),
+                players(game, [
+                    {
+                        "player": 2,
+                        "position": (11,8),
+                        "end": (4,5)
+                    }
+                ]),
+                walls(game, [
+                    "............",
+                    "..x.........",
+                    ".x..........",
+                    ".......x....",
+                    "......xxx...",
+                    "......xxx...",
+                    "......xx....",
+                    ".oo.........",
+                    ".o....xx....",
+                    ".oo..xxx..x.",
+                    ".........x..",
+                    "............",
+                ])
+            ])
 
     def begin(self, game):
         self.initialize_objects(game)
