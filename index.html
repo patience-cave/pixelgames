@@ -289,6 +289,10 @@ import sys, pkgutil, os
     let colors = [];      // [row][col] -> [r,g,b]
     let rects = [];       // [row][col] -> {x,y,w,h}
     const BLOCK_BX = 50;  // same default as your __init__(block_bx=50)
+    let tileOpacity = []; // [row][col] -> opacity (0-1) for fade-in animation
+    let hoveredCell = null; // [row, col] of currently hovered cell
+    let hoverEnabled = true; // whether hover effect is active
+    let clickAnimations = []; // array of {x, y, progress, startTime} for click animations
 
     function setCanvasCSSSize(wCSS, hCSS) {
       const dpr = DPR();
@@ -353,17 +357,29 @@ import sys, pkgutil, os
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       for (let r = 0; r < N_ROWS; r++) {
         for (let c = 0; c < N_COLS; c++) {
-          const rect = rects[r][c];
-          ctx.fillStyle = rgbStr(colors[r][c]);
-          ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+          drawCell(r, c);
         }
+      }
+      // Draw hover border on top if there's a hovered cell
+      if (hoveredCell) {
+        drawHoverBorder(hoveredCell[0], hoveredCell[1]);
       }
     }
 
     function drawCell(r, c) {
       const rect = rects[r][c];
+      const opacity = tileOpacity[r] && tileOpacity[r][c] !== undefined ? tileOpacity[r][c] : 1;
+      ctx.globalAlpha = opacity;
       ctx.fillStyle = rgbStr(colors[r][c]);
       ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+      ctx.globalAlpha = 1;
+    }
+
+    function drawHoverBorder(r, c) {
+      const rect = rects[r][c];
+      ctx.strokeStyle = "rgb(80, 160, 255)"; // Blue border
+      ctx.lineWidth = 2;
+      ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
     }
 
     // --------------------------------
@@ -390,6 +406,15 @@ import sys, pkgutil, os
       const pyColors = pyodide.runPython("py_get_color_grid()");
       colors = pyColors.toJs({ create_proxies: false });
 
+      // Initialize opacity array for fade-in animation
+      tileOpacity = [];
+      for (let r = 0; r < N_ROWS; r++) {
+        tileOpacity[r] = [];
+        for (let c = 0; c < N_COLS; c++) {
+          tileOpacity[r][c] = 0;
+        }
+      }
+
       rects = buildRects();
       drawAll();
 
@@ -397,11 +422,55 @@ import sys, pkgutil, os
       await new Promise(requestAnimationFrame);
       resizeToContainer();
 
+      // Start fade-in animation
+      animateTilesFadeIn();
+
       // Tell Python level logic to begin (like your main())
       pyodide.runPython("py_begin()");
 
       // Start loop
       requestAnimationFrame(tick);
+    }
+
+    // Fade in tiles with a diagonal wave pattern
+    function animateTilesFadeIn() {
+      const totalTiles = N_ROWS * N_COLS;
+      const maxDelay = 800; // Total animation duration in ms
+      const fadeDuration = 400; // Individual tile fade duration in ms
+      
+      // Create animation for each tile with staggered timing
+      for (let r = 0; r < N_ROWS; r++) {
+        for (let c = 0; c < N_COLS; c++) {
+          // Diagonal wave: tiles further from top-left start later
+          const diagonalIndex = r + c;
+          const maxDiagonal = (N_ROWS - 1) + (N_COLS - 1);
+          const delay = (diagonalIndex / maxDiagonal) * maxDelay;
+          
+          animateTile(r, c, delay, fadeDuration);
+        }
+      }
+    }
+
+    function animateTile(r, c, delay, duration) {
+      setTimeout(() => {
+        const startTime = Date.now();
+        function updateOpacity() {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          // Ease-out cubic for smooth animation
+          tileOpacity[r][c] = 1 - Math.pow(1 - progress, 3);
+          
+          drawCell(r, c);
+          if (hoveredCell && hoveredCell[0] === r && hoveredCell[1] === c) {
+            drawHoverBorder(r, c);
+          }
+          
+          if (progress < 1) {
+            requestAnimationFrame(updateOpacity);
+          }
+        }
+        updateOpacity();
+      }, delay);
     }
 
     // --------------------------
@@ -430,6 +499,30 @@ import sys, pkgutil, os
       const [r, c] = hit;
       // Send to Python: position = [c, r]
       pyodide.runPython(`py_press_tile(${c}, ${r})`);
+    });
+
+    canvas.addEventListener("mousemove", (ev) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = ev.clientX - rect.left;
+      const y = ev.clientY - rect.top;
+      const hit = cellAt(x, y);
+      
+      // Check if hover changed
+      const changed = (hoveredCell === null && hit !== null) ||
+                      (hoveredCell !== null && hit === null) ||
+                      (hoveredCell && hit && (hoveredCell[0] !== hit[0] || hoveredCell[1] !== hit[1]));
+      
+      if (changed) {
+        hoveredCell = hit;
+        drawAll();
+      }
+    });
+
+    canvas.addEventListener("mouseleave", () => {
+      if (hoveredCell !== null) {
+        hoveredCell = null;
+        drawAll();
+      }
     });
 
     const keyMap = {
@@ -486,13 +579,20 @@ import sys, pkgutil, os
         // Free the proxy
         pyRes.destroy();
 
+        let needsRedraw = false;
         for (const u of updates) {
           if (u.result === "change_color") {
             const r = u.position[1];
             const c = u.position[0];
             colors[r][c] = u.to_color;
             drawCell(r, c);
+            needsRedraw = true;
           }
+        }
+        
+        // Redraw hover border if any cells were updated
+        if (needsRedraw && hoveredCell) {
+          drawHoverBorder(hoveredCell[0], hoveredCell[1]);
         }
         // you can use `anim` if you want to conditionally throttle
       }
