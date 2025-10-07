@@ -14,6 +14,8 @@ _color_to_rgb = {
     "light gray": (210, 210, 210),
     "dark gray": (50, 50, 50),
     "purple": (160, 85, 200),
+    "orange": (255, 165, 0),
+    "dark red": (150, 0, 0),
 }
 
 

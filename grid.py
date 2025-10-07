@@ -89,6 +89,7 @@ class grid_stateful:
         initial_state.contains_either = self.contains_either
         initial_state.find_object = self.find_object
         initial_state.find_all = self.find_all
+        initial_state.is_modified = self.is_modified
 
         initial_state.objects = []
         initial_state.add_objects = self.add_objects
@@ -106,7 +107,13 @@ class grid_stateful:
         initial_state.intended_actions = [[]]
 
         # these methods are not deepcopied because they are bound to the original object
-        initial_state._no_deepcopy_keys = ["set", "get", "next_frame", "add_colors", "set_background", "contains", "contains_either", "find_object", "find_all", "add_objects"]
+        initial_state._no_deepcopy_keys = [
+            "set", "get", "next_frame",
+            "add_colors", "set_background",
+            "contains", "contains_either",
+            "find_object", "find_all",
+            "add_objects", "is_modified"
+            ]
 
 
         assert(self.current_state == None)
@@ -150,6 +157,9 @@ class grid_stateful:
 
     def previous_grid(self):
         return self.states[-1].grid
+
+    def is_modified(self):
+        return self.intended_actions != [[]]
 
 
 # --------------------------------

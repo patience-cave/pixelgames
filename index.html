@@ -174,7 +174,7 @@ async function loadPython() {
     return text;
   };
 
-  const files = ["grid", "level", "bitpacking", "state"];
+  const files = ["grid", "level", "bitpacking", "state", "helper"];
   const subfiles = [
     "actions",
     "begin","colors","events","get","lose","objects","press_button","press_tile",
@@ -262,6 +262,7 @@ import sys, pkgutil, os
   "sys_path": sys.path,
   "have_grid": bool(pkgutil.find_loader("grid")),
   "have_level": bool(pkgutil.find_loader("level")),
+  "have_helper": bool(pkgutil.find_loader("helper")),
   "have_grid_methods": bool(pkgutil.find_loader("grid_methods")),
 }
 `);

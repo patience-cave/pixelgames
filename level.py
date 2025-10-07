@@ -1,3 +1,44 @@
+from helper import chunk_list_avg_size
+
+class moves_left:
+    def __init__(self, game):
+        self.id = "moves_left"
+        self.colors = {
+            "unused move": "orange",
+            "used move": "dark red"
+        }
+        self.on_move = 0
+
+    def render(self, game):
+        for i in range(game.actual_size[0]):
+            game.set((0,i), "unused move", resolution=False)
+            game.set((game.actual_size[0]-1,i), "unused move", resolution=False)
+            game.set((i,game.actual_size[1]-1), "unused move", resolution=False)
+
+        positions_list = []
+        for i in range(game.actual_size[0]//2):
+            halfway = game.actual_size[0]//2
+            top = game.actual_size[1] - 1
+            positions_list.append([(halfway-i-1, top), (halfway+i, top)])
+        self.positions = positions_list
+
+        for i in range(game.actual_size[1]-1)[::-1]:
+            positions_list.append([(0,i), (game.actual_size[0]-1,i)])
+        
+        chunk_size = len(positions_list) / game.max_moves
+        self.positions = chunk_list_avg_size(positions_list, chunk_size)
+
+    def use_move(self, game):
+        if self.on_move >= len(self.positions):
+            return
+        positions = self.positions[self.on_move]
+        for i in positions:
+            game.set(i[0], "used move", resolution=False)
+            game.set(i[1], "used move", resolution=False)
+
+        self.on_move += 1
+
+
 
 class border:
     def __init__(self, game, initial_direction='up'):
@@ -15,28 +56,30 @@ class border:
         game.set((14,1), "corner")
         game.set((14,14), "corner")
 
-        dx = 0
-        dy = 0
-        if self.initial_direction == "up": dy = 1
-        if self.initial_direction == "down": dy = -1
-        if self.initial_direction == "left": dx = -1
-        if self.initial_direction == "right": dx = 1
-        self.direction(game, dx, dy)
+        dir = self.initial_direction
+        self.direction(game, "")
+        self.direction(game, dir)
 
-    def direction(self, game, dx, dy):
+    def direction(self, game, dir):
+        
+        if dir == self.initial_direction:
+            return
+        
+        self.initial_direction = dir
+
         for i in range(2,14):
             game.set((i,1), "inactive border")
             game.set((i,14), "inactive border")
             game.set((1,i), "inactive border")
             game.set((14,i), "inactive border")
 
-            if dx == 1:
+            if dir == "right":
                 game.set((14,i), "active border")
-            elif dx == -1:
+            elif dir == "left":
                 game.set((1,i), "active border")
-            elif dy == 1:
+            elif dir == "up":
                 game.set((i,14), "active border")
-            elif dy == -1:
+            elif dir == "down":
                 game.set((i,1), "active border")
 
 
@@ -50,9 +93,7 @@ class floor:
     def render(self, game):
         for i in range(2,14):
             for j in range(2,14):
-                print(game.get((i,j)))
                 game.set((i,j), "floor")
-                print(game.get((i,j)))
 
 
 class walls:
@@ -100,10 +141,7 @@ class players:
 
     def move(self, game, dx, dy):
 
-        print("move")
-
         original_positions = { i["player"]: i["position"] for i in self.player_data }
-        print(original_positions)
 
         while True:
 
@@ -119,8 +157,6 @@ class players:
                 sorted_players = sorted(self.player_data, key=lambda x: x["position"][1], reverse=True)
 
             for player in sorted_players:
-
-                print(player)
 
                 id = player["player"]
 
@@ -146,10 +182,10 @@ class players:
                 game.set(new_position, f"player-{id}")
                 still_moving = True
 
-            game.next_frame()
-
             if not still_moving:
                 break
+            else:
+                game.next_frame()
     
         # check if all players have reached the end
         game_win = True
@@ -177,6 +213,7 @@ class ever_maze:
         if game.level == 1:
             game.max_moves = 15
             game.add_objects([
+                moves_left(game),
                 border(game, initial_direction="up"),
                 floor(game),
                 players(game, [
@@ -204,6 +241,7 @@ class ever_maze:
         elif game.level >= 2:
             game.max_moves = 12
             game.add_objects([
+                moves_left(game),
                 border(game, initial_direction="left"),
                 floor(game),
                 players(game, [
@@ -236,8 +274,14 @@ class ever_maze:
         pass
 
     def press_button(self, game, button):
-        game.find_object("border").direction(game, button.dx, button.dy)
+        if button.name not in ["up", "down", "left", "right"]:
+            return
+        
+        game.find_object("border").direction(game, button.name)
         game.find_object("players").move(game, button.dx, button.dy)
+
+        if game.is_modified():
+            game.find_object("moves_left").use_move(game)
 
 
 def choose_game(game_name, game):
@@ -307,12 +351,9 @@ def choose_game(game_name, game):
 #         if new_head == (5,5):
 #             game.lose = True
 
+# def choose_game(game_name, game):
+#     return snake(game)
 
-#     # def __str__(self):
-#     #         safe_view = {"head": self.head, "body": self.body}
-#     #         return json.dumps(safe_view, indent=4, sort_keys=True)
-
-#     # __repr__ = __str__
 
 
 # class snake_game:

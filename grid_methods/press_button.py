@@ -21,6 +21,7 @@ def press_button(self, button):
     button_state.down = button == 'down'
     button_state.right = button == 'right'
     button_state.left = button == 'left'
+    button_state.name = button
 
     if button_state.up or button_state.down:
         button_state.dy = 1 if button_state.up else -1
