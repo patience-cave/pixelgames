@@ -1,119 +1,330 @@
 
-class fruits:
-    def __init__(self, positions):
-        self.id = "fruits"
+class border:
+    def __init__(self, game):
+        self.id = "border"
         self.colors = {
-            "active fruit": "red",
-            "inactive fruit": "black"
+            "corner": "dark gray",
+            "active border": "green",
+            "inactive border": "light gray"
         }
-        self.active_fruit = positions[0]
-        self.inactive_fruit = positions[1:]
 
     def render(self, game):
-        game.set(self.active_fruit, "active fruit")
-        for fruit in self.inactive_fruit:
-            game.set(fruit, "inactive fruit")
+        game.set((1,1), "corner")
+        game.set((1,14), "corner")
+        game.set((14,1), "corner")
+        game.set((14,14), "corner")
 
-    def collect(self, game):
-        self.active_fruit = None
-        if len(self.inactive_fruit):
-            self.active_fruit = self.inactive_fruit.pop(0)
-            game.set(self.active_fruit, "active fruit")
+        for i in range(2,14):
+            game.set((i,1), "inactive border")
+            game.set((i,14), "active border")
+            game.set((1,i), "inactive border")
+            game.set((14,i), "inactive border")
 
-    def no_more_fruits(self):
-        return self.active_fruit == None and self.inactive_fruit == []
+    def direction(self, game, dx, dy):
+        for i in range(2,14):
+            game.set((i,1), "inactive border")
+            game.set((i,14), "inactive border")
+            game.set((1,i), "inactive border")
+            game.set((14,i), "inactive border")
+
+            if dx == 1:
+                game.set((14,i), "active border")
+            elif dx == -1:
+                game.set((1,i), "active border")
+            elif dy == 1:
+                game.set((i,14), "active border")
+            elif dy == -1:
+                game.set((i,1), "active border")
 
 
-class snake:
-    def __init__(self, positions):
-        self.id = "snake"
+class floor:
+    def __init__(self, game):
+        self.id = "floor"
         self.colors = {
-            "head": "green",
-            "body": "dark green"
+            "floor": "purple"
         }
-        self.head = positions[-1]
-        self.body = positions
 
     def render(self, game):
-        for body in self.body:
-            game.set(body, "body")
-        
-        game.set(self.head, "head")
+        for i in range(2,14):
+            for j in range(2,14):
+                print(game.get((i,j)))
+                game.set((i,j), "floor")
+                print(game.get((i,j)))
+
+
+class walls:
+    def __init__(self, game, positions):
+        self.id = "walls"
+        self.colors = {
+            "wall": "dark gray",
+            "white wall": "white"
+        }
+        self.walls = []
+        self.white_walls = []
+        y = 13
+        for i in positions:
+            x = 2
+            for j in i:
+                if j == "x":
+                    self.walls.append((x, y))
+                if j == "o":
+                    self.white_walls.append((x, y))
+                x += 1
+            y -= 1
+
+    def render(self, game):
+        for position in self.walls:
+            game.set(position, "wall")
+
+        for position in self.white_walls:
+            game.set(position, "white wall")
+
+
+class players:
+    def __init__(self, game, player_data):
+        self.id = "players"
+        self.colors = {
+            "player-1": "red",
+            "player-2": "yellow"
+        }
+        self.player_data = player_data
+
+    def render(self, game):
+        for i in self.player_data:
+            pos = i["position"]
+            id = i["player"]
+            game.set(pos, f"player-{id}")
 
     def move(self, game, dx, dy):
-        
-        new_head = (self.head[0] + dx, self.head[1] + dy)
 
-        next_spot = game.get(new_head)
-        
-        if next_spot not in ["empty", "active fruit"]:
-            return
-        
-        self.body.append(new_head)
-        self.head = new_head
+        print("move")
 
-        game.set(self.body[-2], "body")
-        game.set(self.head, "head")
+        original_positions = { i["player"]: i["position"] for i in self.player_data }
+        print(original_positions)
 
-        if next_spot == "active fruit":
-            game.find_object("fruits").collect(game)
+        while True:
 
-        if new_head == (5,5):
-            game.lose = True
+            still_moving = False
+
+            if dx == 1:
+                sorted_players = sorted(self.player_data, key=lambda x: x["position"][0])
+            elif dx == -1:
+                sorted_players = sorted(self.player_data, key=lambda x: x["position"][0], reverse=True)
+            elif dy == 1:
+                sorted_players = sorted(self.player_data, key=lambda x: x["position"][1])
+            elif dy == -1:
+                sorted_players = sorted(self.player_data, key=lambda x: x["position"][1], reverse=True)
+
+            for player in sorted_players:
+
+                print(player)
+
+                id = player["player"]
+
+                previous_position = player["position"]
+                new_position = (previous_position[0] + dx, previous_position[1] + dy)
+
+                if new_position[0] == 2: new_position[0] = 13
+                if new_position[0] == 13: new_position[0] = 2
+                if new_position[1] == 2: new_position[1] = 13
+                if new_position[1] == 13: new_position[1] = 2
+
+                if new_position == original_positions[id]:
+                    continue
+                if game.get(new_position) in ["wall", "white wall"]:
+                    continue
+                if game.get(new_position).startswith("player-"):
+                    continue
+
+                game.set(previous_position, "floor")
+                for i in self.player_data:
+                    if i["player"] == id:
+                        i["position"] = new_position
+                game.set(new_position, f"player-{id}")
+                still_moving = True
+
+            game.next_frame()
+
+            if not still_moving:
+                break
+    
+        # check if all players have reached the end
+        game_win = True
+        for player in self.player_data:
+            if player["position"] != player["end"]:
+                game_win = False
+                break
+
+        if game_win:
+            game.win = True
 
 
-    # def __str__(self):
-    #         safe_view = {"head": self.head, "body": self.body}
-    #         return json.dumps(safe_view, indent=4, sort_keys=True)
 
-    # __repr__ = __str__
+class ever_maze:
 
-
-class snake_game:
     def __init__(self, game):
-
-        game.size = [6,6]
-        game.resolution = 6
-        game.max_attempts = 2
-        game.max_levels = 2
-        game.max_moves = 27
+        game.size = [16,16]
+        game.resolution = 4
+        game.max_levels = 9
         game.set_background("gray")
 
     def initialize_objects(self, game):
-        print('initialize_objects')
-        if game.level == 1:
-            snek = snake([(0,0)])
-            fruts = fruits([(4,1), (2,3), (1,0), (4,3)])
-        else:
-            snek = snake([(1,1)])
-            fruts = fruits([(4,1), (2,3), (1,0), (4,3)])
-
-        game.add_objects([snek, fruts])
+        game.add_objects([
+            border(game),
+            floor(game),
+            players(game, [
+                {
+                    "player": 1,
+                    "position": (10,11),
+                    "end": (6,5)
+                }
+            ]),
+            walls(game, [
+                "......xx..x.",
+                ".x.....xxx..",
+                "..xx..xx.x..",
+                "..xxx.......",
+                ".xxxxx......",
+                "..xx.....x..",
+                ".......xxx..",
+                ".......xxx..",
+                "...o.o..x.x.",
+                "...ooo......",
+                "............"
+            ])
+        ])
 
     def begin(self, game):
-        print('begin')
         self.initialize_objects(game)
 
-    def press_button(self, game, button):
-
-        print(game.level, game.move, game.attempt)
-
-        for i in range(2):
-
-            game.find_object("snake").move(game, button.dx, button.dy)
-
-            if game.find_object("fruits").no_more_fruits():
-                game.win = True
-            
-            game.next_frame()
-
     def press_tile(self, game, x, y):
-        print(x, y)
         pass
+
+    def press_button(self, game, button):
+        game.find_object("border").direction(game, button.dx, button.dy)
+        game.find_object("players").move(game, button.dx, button.dy)
 
 
 def choose_game(game_name, game):
-    return snake_game(game)
+    return ever_maze(game)
+
+
+
+# class fruits:
+#     def __init__(self, positions):
+#         self.id = "fruits"
+#         self.colors = {
+#             "active fruit": "red",
+#             "inactive fruit": "black"
+#         }
+#         self.active_fruit = positions[0]
+#         self.inactive_fruit = positions[1:]
+
+#     def render(self, game):
+#         game.set(self.active_fruit, "active fruit")
+#         for fruit in self.inactive_fruit:
+#             game.set(fruit, "inactive fruit")
+
+#     def collect(self, game):
+#         self.active_fruit = None
+#         if len(self.inactive_fruit):
+#             self.active_fruit = self.inactive_fruit.pop(0)
+#             game.set(self.active_fruit, "active fruit")
+
+#     def no_more_fruits(self):
+#         return self.active_fruit == None and self.inactive_fruit == []
+
+
+# class snake:
+#     def __init__(self, positions):
+#         self.id = "snake"
+#         self.colors = {
+#             "head": "green",
+#             "body": "dark green"
+#         }
+#         self.head = positions[-1]
+#         self.body = positions
+
+#     def render(self, game):
+#         for body in self.body:
+#             game.set(body, "body")
+        
+#         game.set(self.head, "head")
+
+#     def move(self, game, dx, dy):
+        
+#         new_head = (self.head[0] + dx, self.head[1] + dy)
+
+#         next_spot = game.get(new_head)
+        
+#         if next_spot not in ["empty", "active fruit"]:
+#             return
+        
+#         self.body.append(new_head)
+#         self.head = new_head
+
+#         game.set(self.body[-2], "body")
+#         game.set(self.head, "head")
+
+#         if next_spot == "active fruit":
+#             game.find_object("fruits").collect(game)
+
+#         if new_head == (5,5):
+#             game.lose = True
+
+
+#     # def __str__(self):
+#     #         safe_view = {"head": self.head, "body": self.body}
+#     #         return json.dumps(safe_view, indent=4, sort_keys=True)
+
+#     # __repr__ = __str__
+
+
+# class snake_game:
+#     def __init__(self, game):
+
+#         game.size = [6,6]
+#         game.resolution = 6
+#         game.max_attempts = 2
+#         game.max_levels = 2
+#         game.max_moves = 27
+#         game.set_background("gray")
+
+#     def initialize_objects(self, game):
+#         print('initialize_objects')
+#         if game.level == 1:
+#             snek = snake([(0,0)])
+#             fruts = fruits([(4,1), (2,3), (1,0), (4,3)])
+#         else:
+#             snek = snake([(1,1)])
+#             fruts = fruits([(4,1), (2,3), (1,0), (4,3)])
+
+#         game.add_objects([snek, fruts])
+
+#     def begin(self, game):
+#         print('begin')
+#         self.initialize_objects(game)
+
+#     def press_button(self, game, button):
+
+#         print(game.level, game.move, game.attempt)
+
+#         for i in range(2):
+
+#             game.find_object("snake").move(game, button.dx, button.dy)
+
+#             if game.find_object("fruits").no_more_fruits():
+#                 game.win = True
+            
+#             game.next_frame()
+
+#     def press_tile(self, game, x, y):
+#         print(x, y)
+#         pass
+
+
+# def choose_game(game_name, game):
+#     return snake_game(game)
 
 
 
@@ -178,13 +389,9 @@ def choose_game(game_name, game):
 #         game.next_frame()
 #         snek()
 
-        
+#     def press_tile(self, game, x, y):
+#         pass
 
-
-
-    def press_tile(self, game, x, y):
-        pass
-
-def choose_game(game_name, game):
-    return snake_game(game)
+# def choose_game(game_name, game):
+#     return snake_game(game)
 
