@@ -1,5 +1,6 @@
 from game_template import game_template
 from useful_objects import levels_left, moves_left
+from helper import iterate_over_2D, lists_match
 
 class border:
     def __init__(self, game, input={}):
@@ -29,6 +30,30 @@ class floor:
             for j in range(0, game.board_size[1]):
                 game.set((i, j), "floor")
 
+class portals:
+    def __init__(self, game, input={}):
+        self.id = "portals"
+        self.colors = {
+            "portal": "soft blue"
+        }
+        self.portal_pairs = input.get("pairs") or []
+
+    def render(self, game):
+        for portal in self.portal_pairs:
+            game.set(portal[0], "portal")
+            game.set(portal[1], "portal")
+
+    def portal_spawn(self, game, position):
+        for pair in self.portal_pairs:
+            left = pair[0]
+            right = pair[1]
+            if lists_match(left, position):
+                return right
+            if lists_match(right, position):
+                return left
+
+
+
 class fruits:
     def __init__(self, game, input={}):
         self.id = "fruits"
@@ -53,8 +78,6 @@ class fruits:
 
     def no_more_fruits(self):
         return self.active_fruit == None and self.inactive_fruit == []
-
-
 
 class snake:
     def __init__(self, game, input={}):
@@ -81,8 +104,15 @@ class snake:
             return
 
         next_spot = game.get(new_head)
-        
-        if next_spot not in ["floor", "active fruit"]:
+
+        if next_spot == "floor":
+            pass
+        elif next_spot == "active fruit":
+            pass
+        elif next_spot == "portal":
+            game.set(new_head, "body")
+            new_head = game.find_object("portals").portal_spawn(game, new_head)
+        else:
             return
         
         self.body.append(new_head)
@@ -111,7 +141,8 @@ class snake_game(game_template):
             "border": border,
             "floor": floor,
             "snake": snake,
-            "fruits": fruits
+            "fruits": fruits,
+            "portals": portals
         }
 
     def press_button(self, game, button):

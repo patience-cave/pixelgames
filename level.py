@@ -8,7 +8,7 @@ except ImportError:
 
 
 def choose_game(game_name, game):
-    return as66_game(game)
+    return snake_game(game)
 
 
 
