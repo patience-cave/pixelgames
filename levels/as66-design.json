@@ -1,0 +1,510 @@
+{
+    "levels": [
+        {
+            "resolution": [4,4],
+            "origin": [8,8],
+            "board_size": [12, 12],
+            "max_moves": 15,
+            "objects": {
+                "floor": {},
+                "border": {
+                    "initial_direction": "up"
+                },
+                "players": {
+                    "player_data": [
+                        {
+                            "player": "red",
+                            "position": [8,9]
+                        }
+                    ],
+                    "end_data": [
+                        {
+                            "end": [4,3]
+                        }
+                    ]
+                }, 
+                "walls": {
+                    "positions": [
+                        "......xx..x.",
+                        ".x.....xxx..",
+                        "..xx..xx.x..",
+                        "..xxx.......",
+                        ".xxxxx......",
+                        "..xx.....x..",
+                        ".......xxx..",
+                        ".......xxx..",
+                        "...o.o..x.x.",
+                        "...ooo......",
+                        "............",
+                        "............"
+                    ]
+                }
+            }
+        }, 
+        {
+            "resolution": [4, 4],
+            "origin": [8, 8],
+            "board_size": [12, 12],
+            "max_moves": 12,
+            "objects": {
+                "floor": {},
+                "border": {
+                    "initial_direction": "left"
+                },
+                "players": {
+                    "player_data": [
+                        {
+                            "player": "yellow",
+                            "position": [9, 6]
+                        }
+                    ],
+                    "end_data": [
+                        {
+                            "end": [2,3]
+                        }
+                    ]
+                },
+                "walls": {
+                    "positions": [
+                        "............",
+                        "..x.........",
+                        ".x..........",
+                        ".......x....",
+                        "......xxx...",
+                        "......xxx...",
+                        "......xx....",
+                        ".oo.........",
+                        ".o....xx....",
+                        ".oo..xxx..x.",
+                        ".........x..",
+                        "............"
+                    ]
+                }
+            }
+        },
+        {
+            "resolution": [4, 4],
+            "origin": [8, 8],
+            "board_size": [12, 12],
+            "max_moves": 18,
+            "objects": {
+                "floor": {},
+                "border": {
+                    "initial_direction": "up"
+                },
+                "patrols": {
+                    "patrols": [
+                        {
+                            "position": [3,10],
+                            "dx": 1,
+                            "invisible wall": [[0, 10]]
+                        }
+                    ]
+                },
+                "players": {
+                    "player_data": [
+                        {
+                            "player": "yellow",
+                            "position": [4, 7]
+                        }
+                    ],
+                    "end_data": [
+                        {
+                            "end": [5,1]
+                        }
+                    ]
+                },
+                "walls": {
+                    "positions": [
+                        "........x...",
+                        "............",
+                        "............",
+                        "...xx.xx....",
+                        "...x...x....",
+                        "...x......x.",
+                        "......xx..x.",
+                        ".xx.........",
+                        ".x..x.......",
+                        "....ooo..xx.",
+                        "....o.o.....",
+                        "............"
+                    ]
+                }
+            }
+        }, 
+        {
+            "resolution": [4, 4],
+            "origin": [4, 8],
+            "board_size": [14, 12],
+            "max_moves": 18,
+            "objects": {
+                "floor": {},
+                "border": { 
+                    "initial_direction": "down"
+                },
+                "players": {
+                    "player_data": [
+                        {
+                            "player": "cyan",
+                            "position": [7, 3]
+                        }, 
+                        {
+                            "player": "pink",
+                            "position": [4, 7]
+                        }
+                    ],
+                    "end_data": [
+                        {
+                            "end": [2,4]
+                        }, 
+                        {
+                            "end": [4, 1]
+                        }
+                    ]
+                }, 
+                "walls": {
+                    "positions": [
+                        "..............",
+                        "...x....xx....",
+                        "..xx.....xx...",
+                        "..............",
+                        "..xx.....x....",
+                        "..xxx...xx.x..",
+                        ".oo.......xxx.",
+                        ".c.........x..",
+                        ".oo...x....x..",
+                        "...opoxx..xxx.",
+                        "...o.o.....x..",
+                        ".............."
+                    ]
+                }
+            }
+        }, 
+        {
+            "resolution": [3, 3],
+            "origin": [5, 5],
+            "board_size": [18, 18],
+            "max_moves": 20,
+            "objects": {
+                "floor": {},
+                "border": {
+                    "initial_direction": "left"
+                },
+                "players": {
+                    "player_data": [
+                        {
+                            "player": "cyan",
+                            "position": [7, 8]
+                        }
+                    ],
+                    "end_data": [
+                        {
+                            "end": [3, 13],
+                            "end_color": "yellow"
+                        }
+                    ]
+                },
+                "patrols": {
+                    "patrols": [
+                        {
+                            "position": [1, 14],
+                            "dy": -1
+                        },
+                        { 
+                            "position": [6,10]
+                        },
+                        {
+                            "position": [6,4]
+                        },
+                        {
+                            "position": [12,2]
+                        }
+                    ]
+                }, 
+                "color_pads": {
+                    "color_pads": [
+                        {
+                            "color": "yellow",
+                            "positions": [[10, 12], [10, 13], [10, 14]]
+                        }
+                    ]
+                },
+                "walls": {
+                    "positions": [
+                        "..................",
+                        "...xxxxx....xxx...",
+                        "...ooxx.....xxx...",
+                        "....yxx...........",
+                        "...ooxxx..........",
+                        "..................",
+                        "...............x..",
+                        "....x.....x.....x.",
+                        "...xxxx.........x.",
+                        "..xxxxx........xx.",
+                        "..xxxxx....xx..x..",
+                        "....x.......x..x..",
+                        "..................",
+                        "..................",
+                        "..................",
+                        "..................",
+                        ".................."
+                    ]
+                }
+            }
+        },
+        {
+            "resolution": [3, 3],
+            "origin": [12, 10],
+            "board_size": [13, 15],
+            "max_moves": 26,
+            "objects": {
+                "floor": {},
+                "border": {
+                    "initial_direction": "right"
+                },
+                "players": {
+                    "player_data": [
+                        {
+                            "player": "pink",
+                            "position": [8, 5]
+                        }
+                    ],
+                    "end_data": [
+                        {
+                            "end": [3, 4],
+                            "end_color": "soft blue"
+                        }
+                    ]
+                },
+                "patrols": {
+                    "patrols": [
+                        {
+                            "position": [1, 2],
+                            "dx": 1
+                        }
+                    ]
+                },
+                "color_pads": {
+                    "color_pads": [
+                        {
+                            "color": "soft blue",
+                            "positions": [[8, 13], [9, 13], [10, 13]]
+                        }
+                    ]
+                },
+                "walls": {
+                    "positions": [
+                        ".............",
+                        ".............",
+                        ".............",
+                        ".xx.......x..",
+                        ".xxx.x..xxxx.",
+                        "........xxx..",
+                        ".........x...",
+                        ".............",
+                        ".............",
+                        "..obo.x..x...",
+                        "..o.o.xxxxx..",
+                        ".......xxxxx.",
+                        ".......xxxxx.",
+                        "..........x..",
+                        "............."
+                    ]
+                }
+            }
+        }, 
+        {
+            "resolution": [4, 4],
+            "origin": [6, 12],
+            "board_size": [13, 10],
+            "max_moves": 20,
+            "objects": {
+                "floor": {},
+                "border": {
+                    "initial_direction": "right"
+                },
+                "players": {
+                    "player_data": [
+                        {
+                            "player": "pink",
+                            "position": [1, 6]
+                        }
+                    ],
+                    "end_data": [
+                        {
+                            "end": [10, 1],
+                            "end_color": "soft blue"
+                        }
+                    ]
+                },
+                "color_pads": {
+                    "color_pads": [
+                        {
+                            "color": "soft blue",
+                            "positions": [[6, 5], [6, 6], [6, 7]]
+                        }
+                    ]
+                },
+                "walls": {
+                    "positions": [
+                        ".............",
+                        ".........x...",
+                        "..xx....xxxx.",
+                        "..xx.....x...",
+                        ".xxxx....x...",
+                        "..xx.........",
+                        ".............",
+                        ".........obo.",
+                        ".........o.o.",
+                        "............."
+                    ]
+                }
+            }
+        }, 
+        {
+            "resolution": [3, 3],
+            "origin": [6, 7],
+            "board_size": [17, 17],
+            "max_moves": 28,
+            "objects": {
+                "floor": {},
+                "border": {
+                    "initial_direction": "left"
+                },
+                "players": {
+                    "player_data": [
+                        {
+                            "player": "yellow",
+                            "position": [2, 4]
+                        }
+                    ],
+                    "end_data": [
+                        {
+                            "end": [15, 2],
+                            "end_color": "soft blue"
+                        }
+                    ]
+                },
+                "patrols": {
+                    "patrols": [
+                        {
+                            "position": [4, 5],
+                            "dx": 1,
+                            "dy": -1,
+                            "invisible wall": [[2, 7]]
+                        },
+                        {
+                            "position": [8, 10],
+                            "dx": 1,
+                            "dy": 1
+                        }
+                    ]
+                },
+                "color_pads": {
+                    "color_pads": [
+                        {
+                            "color": "soft blue",
+                            "positions": [[6, 13], [6, 14], [6, 15]]
+                        }
+                    ]
+                },
+                "walls": {
+                    "positions": [
+                        ".................",
+                        "............x....",
+                        ".xx.........xx...",
+                        ".x..........x....",
+                        ".................",
+                        ".................",
+                        "......x..........",
+                        ".x....x.....x....",
+                        ".xx..xxx...xx....",
+                        ".x....x.....x....",
+                        ".................",
+                        ".................",
+                        ".x..........x....",
+                        ".xx........xxxoo.",
+                        "..............b..",
+                        "..............oo.",
+                        "................."
+                    ]
+                }
+            }
+        }, 
+        {
+            "resolution": [2, 2],
+            "origin": [11, 15],
+            "board_size": [21, 17],
+            "max_moves": 30,
+            "objects": {
+                "floor": {},
+                "border": {
+                    "initial_direction": "left"
+                },
+                "players": {
+                    "player_data": [
+                        {
+                            "player": "yellow",
+                            "position": [3, 6]
+                        },
+                        {
+                            "player": "cyan",
+                            "position": [11, 2]
+                        }
+                    ],
+                    "end_data": [
+                        {
+                            "end": [3, 13],
+                            "end_color": "soft blue"
+                        }, 
+                        {
+                            "end": [11, 5]
+                        }
+                    ]
+                }, 
+                "patrols": {
+                    "patrols": [
+                        {
+                            "position": [4, 2],
+                            "dx": 1,
+                            "invisible wall": [[2, 2]]
+                        }
+                    ]
+                },
+                "color_pads": {
+                    "color_pads": [
+                        {
+                            "color": "soft blue",
+                            "positions": [[11, 12], [11, 13], [11, 14]]
+                        },
+                        {
+                            "color": "yellow",
+                            "positions": [[9, 12], [9, 13], [9, 14]]
+                        }
+                    ]
+                }, 
+                "walls": {
+                    "positions": [
+                        ".....................",
+                        "......xx......xx.....",
+                        "......xx.....xxx.....",
+                        "..o.o.x.......x......",
+                        "..obo................",
+                        ".....................",
+                        ".xxx.................",
+                        ".xx...........xx.....",
+                        ".............xxx.....",
+                        ".xx...........xx.xxx.",
+                        ".xx.....x.oo.....xxx.",
+                        "..x....xx.o.......xx.",
+                        "..........oo.........",
+                        "..........xx.........",
+                        "..........x.......xx.",
+                        "..........xxx....xxx.",
+                        "....................."
+                    ]
+                }
+            }
+        }
+    ]
+}

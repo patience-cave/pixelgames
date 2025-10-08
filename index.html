@@ -174,11 +174,14 @@ async function loadPython() {
     return text;
   };
 
-  const files = ["grid", "level", "bitpacking", "state", "helper"];
+  const files = ["grid", "level", "bitpacking", "state", "helper", "game_template"];
   const subfiles = [
     "actions",
     "begin","colors","events","get","lose","objects","press_button","press_tile",
     "reset","set","spotlight","undo","update","win"
+  ];
+  const game_template_files = [
+    "as66"
   ];
 
   try {
@@ -186,6 +189,7 @@ async function loadPython() {
 
     // 3) ensure subdir exists BEFORE any nested writes
     pyodide.FS.mkdirTree("grid_methods");
+    pyodide.FS.mkdirTree("levels");
     // pyodide.FS.writeFile("/grid_methods/__init__.py", ""); // empty is fine
     // console.log("analyze /grid_methods:", pyodide.FS.analyzePath("/grid_methods"));
 
@@ -200,6 +204,14 @@ async function loadPython() {
     for (const sf of subfiles) {
       const src = await fetchText(`./grid_methods/${sf}.py`);
       pyodide.FS.writeFile(`${sf}.py`, src);
+    }
+
+    // Write nested files with verification
+    for (const sf of game_template_files) {
+      const src = await fetchText(`./levels/${sf}.py`);
+      pyodide.FS.writeFile(`${sf}.py`, src);
+      const src2 = await fetchText(`./levels/${sf}-design.json`);
+      pyodide.FS.writeFile(`${sf}-design.json`, src2);
     }
 
     // Optional: list directories to confirm layout
