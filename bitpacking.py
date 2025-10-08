@@ -112,3 +112,5 @@ class grid:
     def __str__(self):
         return f"{[i.bits for i in self.bitgrids]}"
 
+    def __repr__(self):
+        return f"{[i.bits for i in self.bitgrids]}"

@@ -1,7 +1,9 @@
 
 
 def clear(self):
-    self.set([0,0], 0, _resolution=self.actual_size, _origin=[0,0], _fast=True)
+    # self.set([0,0], 0, _resolution=self.actual_size, _origin=[0,0], _fast=True)
+    for i in self.current_grid().bitgrids:
+        i.bits = 0
 
 
 def set_rect(self, _to, _position, _size):

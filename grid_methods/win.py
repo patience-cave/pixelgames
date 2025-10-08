@@ -41,6 +41,7 @@ def win(self):
         for j in i:
             o[-1].append((j, self.get(j)))
             self.set(j, win_color, _resolution=False, _origin=False, _fast=True)
+    
 
     for i in o:
         for j, k in i:

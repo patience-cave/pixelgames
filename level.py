@@ -319,6 +319,7 @@ class ever_maze:
         game.resolution = [1,1]
         game.origin = (0,0)
         game.max_levels = 9
+        game.level = 1
         game.set_background("gray")
 
     def initialize_objects(self, game):
@@ -327,9 +328,9 @@ class ever_maze:
             
             game.size = [16,16]
             game.resolution = [4,4]
-            game.origin = (0,0)
+            game.origin = (8,8)
 
-            game.board_origin = (2,2)
+            game.board_origin = (0,0)
             game.board_size = (12,12)
 
             game.max_moves = 15
@@ -343,8 +344,8 @@ class ever_maze:
                 players(game, [
                     {
                         "player": "red",
-                        "position": (10,11),
-                        "end": (6,5)
+                        "position": (8,9),
+                        "end": (4,3)
                     }
                 ]),
                 walls(game, [
@@ -366,9 +367,9 @@ class ever_maze:
             
             game.size = [16,16]
             game.resolution = [4,4]
-            game.origin = (0,0)
+            game.origin = (8,8)
 
-            game.board_origin = (2,2)
+            game.board_origin = (0,0)
             game.board_size = (12,12)
 
             game.max_moves = 12
@@ -382,8 +383,8 @@ class ever_maze:
                 players(game, [
                     {
                         "player": "yellow",
-                        "position": (11,8),
-                        "end": (4,5)
+                        "position": (9,6),
+                        "end": (2,3)
                     }
                 ]),
                 walls(game, [
@@ -405,9 +406,9 @@ class ever_maze:
             
             game.size = [16,16]
             game.resolution = [4,4]
-            game.origin = (0,0)
+            game.origin = (8,8)
 
-            game.board_origin = (2,2)
+            game.board_origin = (0,0)
             game.board_size = (12,12)
             
             game.max_moves = 18
@@ -419,7 +420,7 @@ class ever_maze:
                 floor(game),
                 patrols(game, [
                     {
-                        "position": (5,12),
+                        "position": (3,10),
                         "dx": 1,
                         "dy": 0
                     }
@@ -427,8 +428,8 @@ class ever_maze:
                 players(game, [
                     {
                         "player": "yellow",
-                        "position": (6,9),
-                        "end": (7,3)
+                        "position": (4,7),
+                        "end": (5,1)
                     }
                 ]),
                 walls(game, [
@@ -450,9 +451,9 @@ class ever_maze:
             
             game.size = [16,16]
             game.resolution = [4,4]
-            game.origin = (0,0)
+            game.origin = (4,8)
 
-            game.board_origin = (1,2)
+            game.board_origin = (0,0)
             game.board_size = (14,12)
 
             game.max_moves = 18
@@ -466,13 +467,13 @@ class ever_maze:
                 players(game, [
                     {
                         "player": "cyan",
-                        "position": (8,5),
-                        "end": (3,6)
+                        "position": (7,3),
+                        "end": (2,4)
                     },
                     {
                         "player": "pink",
-                        "position": (5,9),
-                        "end": (5,3)
+                        "position": (4,7),
+                        "end": (4,1)
                     }
                 ]),
                 walls(game, [
@@ -494,9 +495,9 @@ class ever_maze:
 
             #game.size = [22, 22]
             game.resolution = [3,3]
-            game.origin = (2,2)
+            game.origin = (5,5)
 
-            game.board_origin = (1,1)
+            game.board_origin = (0,0)
             game.board_size = (18,18)
 
             game.max_moves = 18
@@ -508,18 +509,18 @@ class ever_maze:
                 floor(game),
                 patrols(game, [
                     {
-                        "position": (2,15),
+                        "position": (1,14),
                         "dy": -1
                     },
-                    { "position": (7,11) },
-                    { "position": (7,5) },
-                    { "position": (13,3) },
+                    { "position": (6,10) },
+                    { "position": (6,4) },
+                    { "position": (12,2) },
                 ]),
                 players(game, [
                     {
                         "player": "cyan",
-                        "position": (8,9),
-                        "end": (4,14),
+                        "position": (7,8),
+                        "end": (3,13),
                         "end_color": "yellow"
                     }
                 ]),
