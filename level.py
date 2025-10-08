@@ -95,6 +95,7 @@ class patrols:
                 continue
 
             if self.check_collision(game, patrol):
+                print("gonna flippo")
                 self.flip(game, patrol)
             else:
 
@@ -109,6 +110,7 @@ class patrols:
                 self.render(game)
 
                 if self.check_collision(game, patrol):
+                    print("needs to flip")
                     self.flip(game, patrol)
 
 
@@ -131,8 +133,9 @@ class patrols:
     def flip(self, game, patrol):
         position, dx, dy = patrol["position"], patrol["dx"], patrol["dy"]
         game.set([position[0]+dx, position[1]+dy], "patrol body")
-        patrol["dx"] = -dx
-        patrol["dy"] = -dy
+        dx, dy = -dx, -dy
+        patrol["dx"] = dx
+        patrol["dy"] = dy
         game.set([position[0]+dx, position[1]+dy], "patrol eye")
 
 
@@ -354,7 +357,7 @@ class ever_maze:
         game.resolution = [1,1]
         game.origin = (0,0)
         game.max_levels = 9
-        game.level = 5
+        game.level = 1
         game.set_background("gray")
 
     def initialize_objects(self, game):
@@ -469,7 +472,7 @@ class ever_maze:
                 ]),
                 walls(game, [
                     "........x...",
-                    "............",
+                    "x...........",
                     "............",
                     "...xx.xx....",
                     "...x...x....",
@@ -535,7 +538,7 @@ class ever_maze:
             game.board_origin = (0,0)
             game.board_size = (18,18)
 
-            game.max_moves = 18
+            game.max_moves = 20
             self.previous_button = "left"
 
             game.add_objects([
@@ -569,7 +572,7 @@ class ever_maze:
                     "..................",
                     "...xxxxx....xxx...",
                     "...ooxx.....xxx...",
-                    "....yxxxx.........",
+                    "....yxx...........",
                     "...ooxxx..........",
                     "..................",
                     "...............x..",
