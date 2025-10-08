@@ -13,6 +13,63 @@ def set_rect(self, _to, _position, _size):
     self.set([0,0], _to, _resolution=[i*j for i,j in zip(_size, self.current_state.resolution)], _origin=_origin)
 
 
+def group_set(self, _positions, _to, _fast=False):
+
+    # convert string to index
+    if isinstance(_to, str):
+        _to = self._colors[_to].index
+
+    if _fast:
+        for position in _positions:
+            self.intended_actions[-1].append({
+                "type": "change_color",
+                "position": position,
+                "to_color": _to
+            })
+
+    else:
+
+        previous_states = self.current_grid().group_get(_positions)    
+
+        self.current_grid().group_set(_positions, _to)
+
+        for position, previous_state in zip(_positions, previous_states):
+            self.intended_actions[-1].append({
+                "type": "change_color",
+                "position": position,
+                "to_color": _to,
+                "from_color": previous_state
+            })
+
+    # for position, previous_state in zip(_positions, previous_states):
+    #     if _fast:
+    #         self.intended_actions[-1].append({
+    #             "type": "change_color",
+    #             "position": position,
+    #             "to_color": _to
+    #         })
+    #         continue
+
+    #     if self.current_grid().set(position, _to):
+
+    #         new_state = self.current_grid().get(position)
+
+    #         # if the previous color state equals the new color state cancel the action
+    #         if previous_state == new_state:
+    #             continue
+
+    #         self.intended_actions[-1].append({
+    #             "type": "change_color",
+    #             "position": position,
+    #             "from_color": previous_state,
+    #             "to_color": new_state
+    #         })
+
+
+    #     self.current_grid().set(position, _to)
+
+
+
 def set(self, _position, _to, _resolution=None, _origin=None, _fast=False):
 
     if _resolution == None:
@@ -61,7 +118,7 @@ def set(self, _position, _to, _resolution=None, _origin=None, _fast=False):
 
             # if the previous color state equals the new color state cancel the action
             if previous_state == new_state:
-                return
+                continue
 
             self.intended_actions[-1].append({
                 "type": "change_color",

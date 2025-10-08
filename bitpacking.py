@@ -1,6 +1,10 @@
 
 
-def _get(bits, at): return (bits >> at) % 2 # == 1
+def _get(bits, at): return (bits >> at) & 1
+
+def _get_group(bits, ats):
+    return [(bits >> at) & 1 for at in ats]
+
 def _paint(bits, at): 
     bits |= 1 << at
     return bits
@@ -27,14 +31,18 @@ def _valid_position(size, position):
         if value >= size[i]: return False
     return True
 
-# assuming the position is valid
+
+from functools import reduce
+import operator
+
 def _position_to_at(size, position):
-    s = position[0]
-    m = 1
-    for i, pos in enumerate(position[1:]):
-        m *= size[i]
-        s += m * pos
-    return s
+    return sum(
+        reduce(operator.mul, size[:i], 1) * pos
+        for i, pos in enumerate(position)
+    )
+
+def _positions_to_ats(size, positions):
+    return [_position_to_at(size, position) for position in positions]
 
 class bitgrid:
     def __init__(self, dimension, rep=0):
@@ -49,6 +57,9 @@ class bitgrid:
 
     def get(self, at):
         return _get(self.bits, at)
+
+    def group_get(self, ats):
+        return _get_group(self.bits, ats)
 
     # returns true if modified
     def set(self, at, to):
@@ -78,6 +89,27 @@ class grid:
     def location_exists(self, position):
         return _valid_position(self.size, position)
 
+    def group_get(self, positions):
+        size = self.size
+        ats = _positions_to_ats(size, positions)
+
+        bitgrids = self.bitgrids  # local
+        n = len(ats)
+        symbols = [0] * n
+
+        for i, grid in enumerate(bitgrids):
+            bits = grid.group_get(ats)     # list/iter of 0/1 for each position
+            w = 1 << i                     # precompute shift once
+            # in-place accumulation (no new list each round)
+            for idx in range(n):
+                symbols[idx] += bits[idx] * w
+                # or: symbols[idx] |= (bits[idx] << i)  # if bits are strictly {0,1}
+        return symbols
+
+    def group_set(self, positions, to):
+        for position in positions:
+            self.set(position, to)
+
     # assuming position exists
     def get(self, position):
         at = _position_to_at(self.size, position)
@@ -99,7 +131,7 @@ class grid:
 
         bits = []
         for i in range(len(self.bitgrids)):
-            bits.append(to % 2)
+            bits.append(to & 1)
             to >>= 1
 
         modified = False

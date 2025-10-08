@@ -172,7 +172,7 @@ try:
     from grid_methods.press_tile import press_tile
     from grid_methods.reset import reset
     from grid_methods.actions import resolve_action, has_intended_actions, resolve_intended_actions, next_frame
-    from grid_methods.set import set, set_rect, clear
+    from grid_methods.set import set, set_rect, clear, group_set
     from grid_methods.undo import undo
     from grid_methods.update import update
     from grid_methods.win import win
@@ -187,7 +187,7 @@ except:
     from press_tile import press_tile
     from reset import reset
     from actions import resolve_action, has_intended_actions, resolve_intended_actions, next_frame
-    from set import set, set_rect, clear
+    from set import set, set_rect, clear, group_set
     from undo import undo
     from update import update
     from win import win
@@ -227,6 +227,7 @@ grid_stateful.next_frame = next_frame
 grid_stateful.set = set
 grid_stateful.set_rect = set_rect
 grid_stateful.clear = clear
+grid_stateful.group_set = group_set
 
 grid_stateful.undo = undo
 

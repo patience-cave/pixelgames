@@ -331,10 +331,10 @@ class players:
                 new_position = [previous_position[0] + dx, previous_position[1] + dy]
 
                 # Looped Grid Logic
-                if new_position[0] <= game.board_origin[0]: new_position[0] = game.board_origin[0] + game.board_size[0] - 1
-                if new_position[1] <= game.board_origin[1]: new_position[1] = game.board_origin[1] + game.board_size[1] - 1
-                if new_position[0] >= game.board_origin[0] + game.board_size[0]: new_position[0] = game.board_origin[0] + 1
-                if new_position[1] >= game.board_origin[1] + game.board_size[1]: new_position[1] = game.board_origin[1] + 1
+                if new_position[0] < 0: new_position[0] = game.board_size[0] - 1
+                if new_position[1] < 0: new_position[1] = game.board_size[1] - 1
+                if new_position[0] >= game.board_size[0]: new_position[0] = 0
+                if new_position[1] >= game.board_size[1]: new_position[1] = 0
 
                 # If the player loops and returns to their prior position, end their motion
                 if id in looped_players:
@@ -403,7 +403,7 @@ class ever_maze:
         game.size = [64, 64]
         game.resolution = [1,1]
         game.origin = (0,0)
-        game.max_levels = 8
+        game.max_levels = 9
         game.level = 1
         game.set_background("gray")
 

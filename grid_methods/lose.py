@@ -15,8 +15,7 @@ def lose(self, animated=True, use_attempt=True):
     if animated:
 
         for i in spots[::-1]:
-            for j in i:
-                self.set(j, lose_color, _resolution=False, _origin=False, _fast=True)
+            self.group_set(i, lose_color, _fast=True)
             self.next_frame()
     
 
@@ -47,9 +46,9 @@ def lose(self, animated=True, use_attempt=True):
     o = []
     for i in spots[::-1]:
         o.append([])
+        self.group_set(i, lose_color, _fast=True)
         for j in i:
             o[-1].append((j, self.get(j)))
-            self.set(j, lose_color, _resolution=False, _origin=False, _fast=True)
 
     
     for i in o[::-1]:
