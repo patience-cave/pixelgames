@@ -64,5 +64,5 @@ def _state_to_color(self, state):
 
 def make_color_grid(self):
     return [[
-            self._state_to_color(self.get([x, y], resolution=False))
+            self._state_to_color(self.get([x, y]))
         for y in range(self.actual_size[0])] for x in range(self.actual_size[1])]

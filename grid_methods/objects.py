@@ -23,5 +23,7 @@ def find_all(self, type_name):
 
 def find_object(self, name):
     o = self.find_all(name)
+    if len(o) == 0:
+        return None
     return o[0]
 

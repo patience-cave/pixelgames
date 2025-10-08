@@ -16,7 +16,7 @@ def win(self):
 
     for i in spots:
         for j in i:
-            self.set(j, win_color, resolution=False, fast=True)
+            self.set(j, win_color, _resolution=False, _origin=False, _fast=True)
         self.next_frame()
 
     
@@ -31,12 +31,7 @@ def win(self):
     self.current_state.attempt = 1
     self.current_state.level = on_level
 
-    for i in spots:
-        for j in i:
-            self.set(j, 0, False)
-
-    for i in self.iterate_grid():
-        self.set(i, 0, resolution=False, fast=True)
+    self.clear()
 
     self.begin()
 
@@ -44,12 +39,12 @@ def win(self):
     for i in spots[::-1]:
         o.append([])
         for j in i:
-            o[-1].append((j, self.get(j, False)))
-            self.set(j, win_color, resolution=False, fast=True)
+            o[-1].append((j, self.get(j)))
+            self.set(j, win_color, _resolution=False, _origin=False, _fast=True)
 
     for i in o:
         for j, k in i:
-            self.set(j, k, resolution=False, fast=True)
+            self.set(j, k, _resolution=False, _origin=False, _fast=True)
         self.next_frame()
 
     self.states = [self.current_state]

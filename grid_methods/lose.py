@@ -16,10 +16,8 @@ def lose(self, animated=True, use_attempt=True):
 
         for i in spots[::-1]:
             for j in i:
-                self.set(j, lose_color, False)
+                self.set(j, lose_color, _resolution=False, _origin=False, _fast=True)
             self.next_frame()
-
-
     
 
     if use_attempt:
@@ -33,10 +31,7 @@ def lose(self, animated=True, use_attempt=True):
     self.current_state.move = 0
     self.states = [self.states[0]]
 
-    for i in spots:
-        for j in i:
-            self.set(j, 0, False)
-
+    self.clear()
 
     if on_attempt > self.current_state.max_attempts:
         self.current_state.attempt = 1
@@ -45,8 +40,7 @@ def lose(self, animated=True, use_attempt=True):
         self.current_state.level = on_level
         self.current_state.attempt = on_attempt
 
-    for i in self.iterate_grid():
-        self.set(i, 0, False)
+    self.clear()
 
     self.begin()
 
@@ -54,13 +48,13 @@ def lose(self, animated=True, use_attempt=True):
     for i in spots[::-1]:
         o.append([])
         for j in i:
-            o[-1].append((j, self.get(j, False)))
-            self.set(j, lose_color, False)
+            o[-1].append((j, self.get(j)))
+            self.set(j, lose_color, _resolution=False, _origin=False, _fast=True)
 
     
     for i in o[::-1]:
         for j, k in i:
-            self.set(j, k, False)
+            self.set(j, k, _resolution=False, _origin=False, _fast=True)
         
         if animated:
             self.next_frame()

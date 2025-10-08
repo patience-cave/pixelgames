@@ -2,6 +2,22 @@
 
 import math
 
+
+def iterate_over_2D(string_list):
+
+    height = len(string_list)
+
+    y = height
+
+    for i in string_list:
+        y -= 1
+        x = 0
+        for j in i:
+            yield (x, y, j)
+            x += 1
+
+
+
 def chunk_list_avg_size(lst, target):
     """
     Split `lst` into chunks whose sizes average ~ `target` (float).

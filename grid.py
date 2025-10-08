@@ -12,9 +12,7 @@ class grid_stateful:
         self.current_state = None
         self.level = None
 
-        self.size = None
         self.actual_size = None
-        self.resolution = None
 
         self._colors = {
             "empty": State({"index": 0, "name": "black", "rgb": (0,0,0)}),
@@ -78,11 +76,12 @@ class grid_stateful:
         initial_state = self.states[0]
 
         initial_state.set = self.set
+        initial_state.set_rect = self.set_rect
         initial_state.get = self.special_get
         initial_state.size = [8,8]
         initial_state.resolution = [1, 1]
         initial_state.actual_size = [8,8]
-
+        initial_state.origin = [0,0]
 
         initial_state.add_colors = self.add_colors
         initial_state.set_background = self.set_background
@@ -110,7 +109,8 @@ class grid_stateful:
 
         # these methods are not deepcopied because they are bound to the original object
         initial_state._no_deepcopy_keys = [
-            "set", "get", "next_frame",
+            "set", "set_rect", "get",
+            "next_frame",
             "add_colors", "set_background",
             "contains", "contains_either",
             "find_object", "find_all",
@@ -132,7 +132,7 @@ class grid_stateful:
             initial_state.actual_size = [i * j for i,j in zip(initial_state.size, initial_state.resolution)]
 
         # ensure size and colors are public variables
-        self.size = initial_state.size
+        # self.size = initial_state.size
         self.resolution = initial_state.resolution
         self.actual_size = initial_state.actual_size
 
@@ -142,13 +142,6 @@ class grid_stateful:
         # Preload the grid
         symbols = len(self._color_map)
         initial_state.grid = grid(self.actual_size, symbols)
-
-
-
-    def iterate_grid(self):
-        for x in range(self.size[0]):
-            for y in range(self.size[1]):
-                yield [x,y]
     
 
     def current_grid(self):
@@ -179,7 +172,7 @@ try:
     from grid_methods.press_tile import press_tile
     from grid_methods.reset import reset
     from grid_methods.actions import resolve_action, has_intended_actions, resolve_intended_actions, next_frame
-    from grid_methods.set import set
+    from grid_methods.set import set, set_rect, clear
     from grid_methods.undo import undo
     from grid_methods.update import update
     from grid_methods.win import win
@@ -194,7 +187,7 @@ except:
     from press_tile import press_tile
     from reset import reset
     from actions import resolve_action, has_intended_actions, resolve_intended_actions, next_frame
-    from set import set
+    from set import set, set_rect, clear
     from undo import undo
     from update import update
     from win import win
@@ -232,6 +225,8 @@ grid_stateful.resolve_intended_actions = resolve_intended_actions
 grid_stateful.next_frame = next_frame
 
 grid_stateful.set = set
+grid_stateful.set_rect = set_rect
+grid_stateful.clear = clear
 
 grid_stateful.undo = undo
 
