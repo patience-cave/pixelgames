@@ -386,6 +386,7 @@ class ever_maze:
                         "end": (4,3)
                     }
                 ]),
+                color_pads(game, []),
                 walls(game, [
                     "......xx..x.",
                     ".x.....xxx..",
@@ -418,6 +419,7 @@ class ever_maze:
                 border(game, initial_direction=self.previous_button),
                 floor(game),
                 patrols(game, []),
+                color_pads(game, []),
                 players(game, [
                     {
                         "player": "yellow",
@@ -470,6 +472,7 @@ class ever_maze:
                         "end": (5,1)
                     }
                 ]),
+                color_pads(game, []),
                 walls(game, [
                     "........x...",
                     "x...........",
@@ -514,6 +517,7 @@ class ever_maze:
                         "end": (4,1)
                     }
                 ]),
+                color_pads(game, []),
                 walls(game, [
                     "..............",
                     "...x....xx....",
