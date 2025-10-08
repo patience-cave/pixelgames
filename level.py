@@ -129,7 +129,10 @@ class patrols:
 
         for position in edge_positions:
             if game.get(position) not in ["floor"]:
-                return True
+                if game.get(position).startswith("player"):
+                    game.lose = True
+                else:
+                    return True
         return False
     
     def flip(self, game, patrol):
@@ -337,6 +340,7 @@ class players:
         # check if all players have reached the end
         game_win = True
         for player in self.player_data:
+            print(player["position"], player["end"])
 
             # did the player reach the end?
             for i in zip(player["position"], player["end"]):
@@ -695,6 +699,69 @@ class ever_maze:
                 ]),
             ])
 
+        elif game.level == 8:
+
+            game.resolution = [3,3]
+            game.origin = (6,7)
+
+            game.board_origin = (0,0)
+            game.board_size = (17,17)
+
+            game.max_moves = 28
+            self.previous_button = "left"
+
+            game.add_objects([
+                moves_left(game),
+                border(game, initial_direction=self.previous_button),
+                floor(game),
+                patrols(game, [
+                    {
+                        "position": (4,5),
+                        "dx": 1,
+                        "dy": -1
+                    },
+                    {
+                        "position": (8,10),
+                        "dx": 1,
+                        "dy": 1
+                    }
+                ]),
+                players(game, [
+                    {
+                        "player": "yellow",
+                        "position": (2,4),
+                        "end": (15,2),
+                        "end_color": "soft blue"
+                    }
+                ]),
+                color_pads(game, [
+                    { 
+                        "color": "soft blue",
+                        "positions": [(6,13), (6,14), (6,15)]
+                    }
+                ]),
+                walls(game, [
+                    ".................",
+                    "............x....",
+                    ".xx.........xx...",
+                    ".x..........x....",
+                    ".................",
+                    ".................",
+                    "......x..........",
+                    ".x....x.....x....",
+                    ".xx..xxx...xx....",
+                    ".x....x.....x....",
+                    ".................",
+                    ".................",
+                    ".x..........x....",
+                    ".xx........xxxoo.",
+                    "..............b..",
+                    "..............oo.",
+                    ".................",
+                ]),
+            ])
+
+
 
 
     def begin(self, game):
@@ -705,7 +772,7 @@ class ever_maze:
 
     def press_button(self, game, button):
 
-        if self.previous_button == button.name:
+        if self.previous_button == button.name and game.move != 0:
             return
         
         if button.name not in ["up", "down", "left", "right"]:
