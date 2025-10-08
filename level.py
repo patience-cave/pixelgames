@@ -18,6 +18,38 @@ class color_pads:
                 game.set(position, f"pad-{color}")
 
 
+class levels_left:
+    def __init__(self, game):
+        self.id = "levels_left"
+        self.colors = {
+            "unused level": "black",
+            "used level": "white"
+        }
+        game.protected_colors += ["used level", "unused level"]
+        self.on_level = 0
+    
+    def render(self, game):
+
+        positions_list = []
+        for i in range(game.actual_size[0]):
+            positions_list.append([i, 0])
+        
+        chunk_size = len(positions_list) / game.max_levels
+        self.positions = chunk_list_avg_size(positions_list, chunk_size)
+
+        self.update_level(game)
+
+    def update_level(self, game):
+
+        for i, ps in enumerate(self.positions):
+            if game.level > i + 1:
+                for j in ps:
+                    game.set(j, "used level", _resolution=False, _origin=False)
+            else:
+                for j in ps:
+                    game.set(j, "unused level", _resolution=False, _origin=False)
+
+
 
 class moves_left:
     def __init__(self, game):
@@ -110,20 +142,20 @@ class patrols:
                 patrol["position"] = (position[0]+dx, position[1]+dy)
                 self.render(game)
 
-                if self.check_collision(game, patrol):
+                if self.check_collision(game, patrol, safe=True):
                     self.flip(game, patrol)
 
 
-    def check_collision(self, game, patrol):
+    def check_collision(self, game, patrol, safe=False):
         position, dx, dy = patrol["position"], patrol["dx"], patrol["dy"]
 
         edge_positions = set()
         if dx != 0:
             for i in [-1, 0, 1]:
-                edge_positions.add((position[0]+dx+dx, position[1]+i))
+                edge_positions.add((position[0]+dx+dx, position[1]+i+dy))
         if dy != 0:
             for i in [-1, 0, 1]:
-                edge_positions.add((position[0]+i, position[1]+dy+dy))
+                edge_positions.add((position[0]+i+dx, position[1]+dy+dy))
         if dx != 0 and dy != 0:
             edge_positions.add((position[0]+dx+dx, position[1]+dy+dy))
 
@@ -136,7 +168,8 @@ class patrols:
             
             if game.get(position) not in ["floor"]:
                 if game.get(position).startswith("player"):
-                    game.lose = True
+                    if not safe:
+                        game.lose = True
                 else:
                     return True
         return False
@@ -390,6 +423,7 @@ class ever_maze:
 
             game.add_objects([
                 moves_left(game),
+                levels_left(game),
                 border(game, initial_direction=self.previous_button),
                 floor(game),
                 patrols(game, []),
@@ -434,6 +468,7 @@ class ever_maze:
 
             game.add_objects([
                 moves_left(game),
+                levels_left(game),
                 border(game, initial_direction=self.previous_button),
                 floor(game),
                 patrols(game, []),
@@ -477,6 +512,7 @@ class ever_maze:
 
             game.add_objects([
                 moves_left(game),
+                levels_left(game),
                 border(game, initial_direction=self.previous_button),
                 floor(game),
                 patrols(game, [
@@ -526,6 +562,7 @@ class ever_maze:
 
             game.add_objects([
                 moves_left(game),
+                levels_left(game),
                 border(game, initial_direction=self.previous_button),
                 floor(game),
                 patrols(game, []),
@@ -576,6 +613,7 @@ class ever_maze:
 
             game.add_objects([
                 moves_left(game),
+                levels_left(game),
                 border(game, initial_direction=self.previous_button),
                 floor(game),
                 patrols(game, [
@@ -637,6 +675,7 @@ class ever_maze:
 
             game.add_objects([
                 moves_left(game),
+                levels_left(game),
                 border(game, initial_direction=self.previous_button),
                 floor(game),
                 patrols(game, [
@@ -694,6 +733,7 @@ class ever_maze:
 
             game.add_objects([
                 moves_left(game),
+                levels_left(game),
                 border(game, initial_direction=self.previous_button),
                 floor(game),
                 patrols(game, []),
@@ -741,6 +781,7 @@ class ever_maze:
 
             game.add_objects([
                 moves_left(game),
+                levels_left(game),
                 border(game, initial_direction=self.previous_button),
                 floor(game),
                 patrols(game, [
@@ -807,6 +848,7 @@ class ever_maze:
 
             game.add_objects([
                 moves_left(game),
+                levels_left(game),
                 border(game, initial_direction=self.previous_button),
                 floor(game),
                 patrols(game, [
@@ -888,6 +930,7 @@ class ever_maze:
 
         if game.is_modified():
             game.find_object("moves_left").use_move(game)
+            game.find_object("levels_left").update_level(game)
 
 
 def choose_game(game_name, game):
