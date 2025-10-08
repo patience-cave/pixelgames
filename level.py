@@ -659,7 +659,7 @@ class ever_maze:
             game.board_origin = (0,0)
             game.board_size = (13,10)
 
-            game.max_moves = 160
+            game.max_moves = 20
             self.previous_button = "right"
 
             game.add_objects([
