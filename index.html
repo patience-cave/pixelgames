@@ -174,14 +174,14 @@ async function loadPython() {
     return text;
   };
 
-  const files = ["grid", "level", "bitpacking", "state", "helper", "game_template"];
+  const files = ["grid", "level", "bitpacking", "state", "helper", "game_template", "useful_objects"];
   const subfiles = [
     "actions",
     "begin","colors","events","get","lose","objects","press_button","press_tile",
     "reset","set","spotlight","undo","update","win"
   ];
   const game_template_files = [
-    "as66"
+    "as66", "snake"
   ];
 
   try {
@@ -205,6 +205,8 @@ async function loadPython() {
       const src = await fetchText(`./grid_methods/${sf}.py`);
       pyodide.FS.writeFile(`${sf}.py`, src);
     }
+    
+    console.log("game_template_files", game_template_files);
 
     // Write nested files with verification
     for (const sf of game_template_files) {

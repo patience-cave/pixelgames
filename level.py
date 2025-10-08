@@ -1,78 +1,15 @@
 
 try:
     from levels.as66 import as66_game
-except:
+    from levels.snake import snake_game
+except ImportError:
     from as66 import as66_game
+    from snake import snake_game
 
 
 def choose_game(game_name, game):
     return as66_game(game)
 
-
-# class fruits:
-#     def __init__(self, positions):
-#         self.id = "fruits"
-#         self.colors = {
-#             "active fruit": "red",
-#             "inactive fruit": "black"
-#         }
-#         self.active_fruit = positions[0]
-#         self.inactive_fruit = positions[1:]
-
-#     def render(self, game):
-#         game.set(self.active_fruit, "active fruit")
-#         for fruit in self.inactive_fruit:
-#             game.set(fruit, "inactive fruit")
-
-#     def collect(self, game):
-#         self.active_fruit = None
-#         if len(self.inactive_fruit):
-#             self.active_fruit = self.inactive_fruit.pop(0)
-#             game.set(self.active_fruit, "active fruit")
-
-#     def no_more_fruits(self):
-#         return self.active_fruit == None and self.inactive_fruit == []
-
-
-# class snake:
-#     def __init__(self, positions):
-#         self.id = "snake"
-#         self.colors = {
-#             "head": "green",
-#             "body": "dark green"
-#         }
-#         self.head = positions[-1]
-#         self.body = positions
-
-#     def render(self, game):
-#         for body in self.body:
-#             game.set(body, "body")
-        
-#         game.set(self.head, "head")
-
-#     def move(self, game, dx, dy):
-        
-#         new_head = (self.head[0] + dx, self.head[1] + dy)
-
-#         next_spot = game.get(new_head)
-        
-#         if next_spot not in ["empty", "active fruit"]:
-#             return
-        
-#         self.body.append(new_head)
-#         self.head = new_head
-
-#         game.set(self.body[-2], "body")
-#         game.set(self.head, "head")
-
-#         if next_spot == "active fruit":
-#             game.find_object("fruits").collect(game)
-
-#         if new_head == (5,5):
-#             game.lose = True
-
-# def choose_game(game_name, game):
-#     return snake(game)
 
 
 

@@ -1,4 +1,6 @@
 {
+    "max_levels": 9,
+    "background": "gray",
     "levels": [
         {
             "resolution": [4,4],

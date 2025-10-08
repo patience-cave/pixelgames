@@ -16,7 +16,20 @@ class game_template:
             with open(json_file, "r") as f:
                 data = json.load(f)
 
+        if "initialized" not in game:
+            game.size = data.get("size") or [64, 64]
+            game.resolution = data.get("resolution") or [1,1]
+            game.origin = data.get("origin") or [0,0]
+            game.level = data.get("level") or 1
+            if "background" in data:
+                game.set_background(data["background"])
+
         level_data = data["levels"][(game.level - 1) % len(data["levels"])]
+        game["origin"] = [0,0]
+
+        if "initialized" not in game:
+            game.max_levels = data.get("max_levels") or len(data["levels"])
+            game.initialized = True
 
         for item in level_data:
             if item == "objects":
@@ -31,7 +44,12 @@ class game_template:
         for object_type in objects:
 
             object_class = game.list_of_objects[object_type]
-            o = object_class(game, *objects[object_type].values())
+            #o = object_class(game, *objects[object_type].values())
+            if objects[object_type] == {}:
+                o = object_class(game)
+            else:
+                o = object_class(game, objects[object_type])
+
             _objects.append(o)
 
             if object_type in unseen_objects:
@@ -45,7 +63,7 @@ class game_template:
         game.add_objects(_objects)
 
     def begin(self, game):
-        pass
+        self.initialize_objects(game)
     
     def press_button(self, game, button):
         pass
