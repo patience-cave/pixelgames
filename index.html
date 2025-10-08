@@ -205,8 +205,6 @@ async function loadPython() {
       const src = await fetchText(`./grid_methods/${sf}.py`);
       pyodide.FS.writeFile(`${sf}.py`, src);
     }
-    
-    console.log("game_template_files", game_template_files);
 
     // Write nested files with verification
     for (const sf of game_template_files) {

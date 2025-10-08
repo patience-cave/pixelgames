@@ -53,6 +53,32 @@ class portals:
                 return left
 
 
+class inverters:
+    def __init__(self, game, input={}):
+        self.id = "inverters"
+        self.colors = {
+            "inverter": "dark green"
+        }
+        self.positions = input.get("positions") or []
+    
+    def render(self, game):
+        for position in self.positions:
+            game.set(position, "inverter")
+
+
+class walls:
+    def __init__(self, game, input={}):
+        self.id = "walls"
+        self.colors = {
+            "wall": "black"
+        }
+        self.positions = input.get("positions") or []
+    
+    def render(self, game):
+        for position in self.positions:
+            game.set(position, "wall")
+
+
 
 class fruits:
     def __init__(self, game, input={}):
@@ -79,14 +105,26 @@ class fruits:
     def no_more_fruits(self):
         return self.active_fruit == None and self.inactive_fruit == []
 
-class snake:
+
+class snakes:
     def __init__(self, game, input={}):
-        self.id = "snake"
+        self.id = "snakes"
         self.colors = {
             "head": "green",
-            "body": "dark green"
+            "body": "dark green",
         }
-        positions = input["positions"]
+        self.snakes = []
+        for i in input.get("snakes") or []:
+            self.snakes.append(snake(game, i))
+
+    def render(self, game):
+        for snake in self.snakes:
+            snake.render(game)
+
+
+class snake:
+    def __init__(self, game, input={}):
+        positions = input.get("positions") or []
         self.head = positions[-1]
         self.body = positions
 
@@ -112,6 +150,25 @@ class snake:
         elif next_spot == "portal":
             game.set(new_head, "body")
             new_head = game.find_object("portals").portal_spawn(game, new_head)
+        elif next_spot == "inverter":
+
+            game.set(new_head, "head")
+            game.next_frame()
+
+            previous_spot = new_head
+
+            for position in self.body[::-1]:
+                game.set(position, "head")
+                game.set(previous_spot, "body")
+                previous_spot = position
+                game.next_frame()
+
+            self.body.append(new_head)
+            self.body = self.body[::-1]
+            self.head = self.body[-1]
+            game.set(self.body[-2], "body")
+            return
+
         else:
             return
         
@@ -140,14 +197,17 @@ class snake_game(game_template):
             "levels_left": levels_left,
             "border": border,
             "floor": floor,
-            "snake": snake,
+            "snakes": snakes,
             "fruits": fruits,
-            "portals": portals
+            "portals": portals,
+            "inverters": inverters,
+            "walls": walls
         }
 
     def press_button(self, game, button):
         
-        game.find_object("snake").move(game, button.dx, button.dy)
+        for snake in game.find_object("snakes").snakes:
+            snake.move(game, button.dx, button.dy)
 
         if game.find_object("fruits").no_more_fruits():
             game.win = True
