@@ -5,7 +5,9 @@ class color_pads:
     def __init__(self, game, color_pads):
         self.id = "color_pads"
         self.colors = {
-            "pad-yellow": "yellow"
+            "pad-yellow": "yellow",
+            "pad-cyan": "cyan",
+            "pad-soft blue": "soft blue",
         }
         self.color_pads = color_pads
     
@@ -213,6 +215,7 @@ class walls:
             "wall-cyan": "cyan",
             "wall-pink": "pink",
             "wall-yellow": "yellow",
+            "wall-soft blue": "soft blue",
         }
         self.walls = {}
         for i in self.colors:
@@ -226,6 +229,7 @@ class walls:
             if i == "c": self.walls["wall-cyan"].append((x, y))
             if i == "p": self.walls["wall-pink"].append((x, y))
             if i == "y": self.walls["wall-yellow"].append((x, y))
+            if i == "b": self.walls["wall-soft blue"].append((x, y))
 
     def render(self, game):
 
@@ -243,6 +247,7 @@ class players:
             "player-yellow": "yellow",
             "player-cyan": "cyan",
             "player-pink": "pink",
+            "player-soft blue": "soft blue",
         }
         self.player_data = player_data
 
@@ -592,6 +597,105 @@ class ever_maze:
                     ".................."
                 ])
             ])
+        elif game.level == 6:
+
+            game.resolution = [3,3]
+            game.origin = (12,10)
+
+            game.board_origin = (0,0)
+            game.board_size = (13,15)
+
+            game.max_moves = 16
+            self.previous_button = "right"
+
+            game.add_objects([
+                moves_left(game),
+                border(game, initial_direction=self.previous_button),
+                floor(game),
+                patrols(game, [
+                    {
+                        "position": (1,2),
+                        "dx": 1,
+                    }
+                ]),
+                players(game, [
+                    {
+                        "player": "pink",
+                        "position": (8,5),
+                        "end": (3,4),
+                        "end_color": "soft blue"
+                    }
+                ]),
+                color_pads(game, [
+                    {
+                        "color": "soft blue",
+                        "positions": [(8,13), (9,13), (10,13)]
+                    }
+                ]),
+                walls(game, [
+                    ".............",
+                    ".............",
+                    ".............",
+                    ".xx.......x..",
+                    ".xxx.x..xxxx.",
+                    "........xxx..",
+                    ".........x...",
+                    ".............",
+                    ".............",
+                    "..obo.x..x...",
+                    "..o.o.xxxxx..",
+                    ".......xxxxx.",
+                    ".......xxxxx.",
+                    "..........x..",
+                    "............."
+                ]),
+            ])
+
+        elif game.level == 7:
+
+            game.resolution = [4,4]
+            game.origin = (6,12)
+
+            game.board_origin = (0,0)
+            game.board_size = (13,10)
+
+            game.max_moves = 160
+            self.previous_button = "right"
+
+            game.add_objects([
+                moves_left(game),
+                border(game, initial_direction=self.previous_button),
+                floor(game),
+                patrols(game, []),
+                players(game, [
+                    {
+                        "player": "pink",
+                        "position": (1,6),
+                        "end": (1,11),
+                        "end_color": "soft blue"
+                    }
+                ]),
+                color_pads(game, [
+                    {
+                        "color": "soft blue",
+                        "positions": [(6,5), (6,6), (6,7)]
+                    }
+                ]),
+                walls(game, [
+                    ".............",
+                    ".........x...",
+                    "..xx....xxxx.",
+                    "..xx.....x...",
+                    ".xxxx....x...",
+                    "..xx.........",
+                    ".............",
+                    ".........obo.",
+                    ".........o.o.",
+                    ".............",
+                ]),
+            ])
+
+
 
     def begin(self, game):
         self.initialize_objects(game)
@@ -600,6 +704,9 @@ class ever_maze:
         pass
 
     def press_button(self, game, button):
+
+        if self.previous_button == button.name:
+            return
         
         if button.name not in ["up", "down", "left", "right"]:
             return
