@@ -1,5 +1,22 @@
 from helper import chunk_list_avg_size, iterate_over_2D
 
+
+class color_pads:
+    def __init__(self, game, color_pads):
+        self.id = "color_pads"
+        self.colors = {
+            "pad-yellow": "yellow"
+        }
+        self.color_pads = color_pads
+    
+    def render(self, game):
+        for pad in self.color_pads:
+            for position in pad["positions"]:
+                color = pad["color"]
+                game.set(position, f"pad-{color}")
+
+
+
 class moves_left:
     def __init__(self, game):
         self.id = "moves_left"
@@ -253,6 +270,10 @@ class players:
 
             for player in sorted_players:
 
+                if "tile_covered" not in player:
+                    player["tile_covered"] = "floor"
+                previously_covered = player["tile_covered"]
+
                 id = player["player"]
 
                 previous_position = player["position"]
@@ -278,8 +299,22 @@ class players:
                     continue
                 if game.get(new_position).startswith("player"):
                     continue
+                
+                if game.get(new_position).startswith("pad"):
+                    old_color = player["player"]
+                    player["tile_covered"] = game.get(new_position)
+                    player["player"] = game.get(new_position).split("-")[1]
+                    id = player["player"]
+                    
+                    if id != old_color:
+                        original_positions[id] = original_positions[old_color]
+                        del original_positions[old_color]
 
-                game.set(previous_position, "floor")
+
+                if game.get(new_position).startswith("floor"):
+                    player["tile_covered"] = "floor"
+
+                game.set(previous_position, previously_covered)
                 for i in self.player_data:
                     if i["player"] == id:
                         i["position"] = new_position
@@ -319,7 +354,7 @@ class ever_maze:
         game.resolution = [1,1]
         game.origin = (0,0)
         game.max_levels = 9
-        game.level = 1
+        game.level = 5
         game.set_background("gray")
 
     def initialize_objects(self, game):
@@ -522,6 +557,12 @@ class ever_maze:
                         "position": (7,8),
                         "end": (3,13),
                         "end_color": "yellow"
+                    }
+                ]),
+                color_pads(game, [
+                    {
+                        "color": "yellow",
+                        "positions": [(10,12), (10,13), (10,14)]
                     }
                 ]),
                 walls(game, [
