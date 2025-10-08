@@ -3,6 +3,10 @@
 import math
 
 
+def lists_match(list1, list2):
+    return set(i == j for i, j in zip(list1, list2)) == { True }
+
+    
 def iterate_over_2D(string_list):
 
     height = len(string_list)

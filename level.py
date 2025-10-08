@@ -1,4 +1,4 @@
-from helper import chunk_list_avg_size, iterate_over_2D
+from helper import chunk_list_avg_size, iterate_over_2D, lists_match
 
 
 class color_pads:
@@ -97,7 +97,6 @@ class patrols:
                 continue
 
             if self.check_collision(game, patrol):
-                print("gonna flippo")
                 self.flip(game, patrol)
             else:
 
@@ -112,7 +111,6 @@ class patrols:
                 self.render(game)
 
                 if self.check_collision(game, patrol):
-                    print("needs to flip")
                     self.flip(game, patrol)
 
 
@@ -126,8 +124,16 @@ class patrols:
         if dy != 0:
             for i in [-1, 0, 1]:
                 edge_positions.add((position[0]+i, position[1]+dy+dy))
+        if dx != 0 and dy != 0:
+            edge_positions.add((position[0]+dx+dx, position[1]+dy+dy))
 
         for position in edge_positions:
+
+            if "invisible wall" in patrol:
+                for invisible_wall in patrol["invisible wall"]:
+                    if lists_match(position, invisible_wall):
+                        return True
+            
             if game.get(position) not in ["floor"]:
                 if game.get(position).startswith("player"):
                     game.lose = True
@@ -243,7 +249,7 @@ class walls:
 
 
 class players:
-    def __init__(self, game, player_data):
+    def __init__(self, game, player_data, end_data=[]):
         self.id = "players"
         self.colors = {
             "player-red": "red",
@@ -253,6 +259,7 @@ class players:
             "player-soft blue": "soft blue",
         }
         self.player_data = player_data
+        self.end_data = end_data
 
     def render(self, game):
         for i in self.player_data:
@@ -339,18 +346,16 @@ class players:
     
         # check if all players have reached the end
         game_win = True
-        for player in self.player_data:
-            print(player["position"], player["end"])
 
-            # did the player reach the end?
-            for i in zip(player["position"], player["end"]):
-                if i[0] != i[1]:
+        for end in self.end_data:
+
+            if "end_color" in end:
+                end_color = end["end_color"]
+                if not game.get(end["end"]).startswith(f"player-{end_color}"):
                     game_win = False
                     break
-
-            # is the player the correct color?
-            if "end_color" in player:
-                if player["player"] != player["end_color"]:
+            else:
+                if not game.get(end["end"]).startswith("player"):
                     game_win = False
                     break
 
@@ -365,7 +370,7 @@ class ever_maze:
         game.size = [64, 64]
         game.resolution = [1,1]
         game.origin = (0,0)
-        game.max_levels = 9
+        game.max_levels = 8
         game.level = 1
         game.set_background("gray")
 
@@ -392,6 +397,10 @@ class ever_maze:
                     {
                         "player": "red",
                         "position": (8,9),
+                        "end": (4,3)
+                    }
+                ], [
+                    {
                         "end": (4,3)
                     }
                 ]),
@@ -433,6 +442,9 @@ class ever_maze:
                     {
                         "player": "yellow",
                         "position": (9,6),
+                    }
+                ], [
+                    {
                         "end": (2,3)
                     }
                 ]),
@@ -471,20 +483,23 @@ class ever_maze:
                     {
                         "position": (3,10),
                         "dx": 1,
-                        "dy": 0
+                        "invisible wall": [(0, 10)]
                     }
                 ]),
                 players(game, [
                     {
                         "player": "yellow",
                         "position": (4,7),
+                    }
+                ], [
+                    {
                         "end": (5,1)
                     }
                 ]),
                 color_pads(game, []),
                 walls(game, [
                     "........x...",
-                    "x...........",
+                    "............",
                     "............",
                     "...xx.xx....",
                     "...x...x....",
@@ -518,11 +533,16 @@ class ever_maze:
                     {
                         "player": "cyan",
                         "position": (7,3),
-                        "end": (2,4)
                     },
                     {
                         "player": "pink",
                         "position": (4,7),
+                    }
+                ], [
+                    {
+                        "end": (2,4)
+                    },
+                    {
                         "end": (4,1)
                     }
                 ]),
@@ -571,6 +591,9 @@ class ever_maze:
                     {
                         "player": "cyan",
                         "position": (7,8),
+                    }
+                ], [
+                    {
                         "end": (3,13),
                         "end_color": "yellow"
                     }
@@ -626,6 +649,9 @@ class ever_maze:
                     {
                         "player": "pink",
                         "position": (8,5),
+                    }
+                ], [
+                    {
                         "end": (3,4),
                         "end_color": "soft blue"
                     }
@@ -675,7 +701,10 @@ class ever_maze:
                     {
                         "player": "pink",
                         "position": (1,6),
-                        "end": (1,11),
+                    }
+                ], [
+                    {
+                        "end": (10,1),
                         "end_color": "soft blue"
                     }
                 ]),
@@ -718,7 +747,8 @@ class ever_maze:
                     {
                         "position": (4,5),
                         "dx": 1,
-                        "dy": -1
+                        "dy": -1,
+                        "invisible wall": [(2, 7)]
                     },
                     {
                         "position": (8,10),
@@ -729,7 +759,10 @@ class ever_maze:
                 players(game, [
                     {
                         "player": "yellow",
-                        "position": (2,4),
+                        "position": (2,4)
+                    }
+                ], [
+                    {
                         "end": (15,2),
                         "end_color": "soft blue"
                     }
@@ -761,7 +794,76 @@ class ever_maze:
                 ]),
             ])
 
+        elif game.level == 9:
 
+            game.resolution = [2,2]
+            game.origin = (11,15)
+
+            game.board_origin = (0,0)
+            game.board_size = (21,17)
+
+            game.max_moves = 30
+            self.previous_button = "left"
+
+            game.add_objects([
+                moves_left(game),
+                border(game, initial_direction=self.previous_button),
+                floor(game),
+                patrols(game, [
+                    {
+                        "position": (4,2),
+                        "dx": 1,
+                        "invisible wall": [(2, 2)]
+                    }
+                ]),
+                players(game, [
+                    {
+                        "player": "yellow",
+                        "position": (3,6),
+                    },
+                    {
+                        "player": "cyan",
+                        "position": (11,2),
+                    }
+                ], [
+                    {
+                        "end": (3,13),
+                        "end_color": "soft blue"
+                    }, 
+                    {
+                        "end": (11,5),
+                    }
+                ]),
+                color_pads(game, [
+                    {
+                        "color": "soft blue",
+                        "positions": [(11,12), (11,13), (11,14)]
+                    }, 
+                    {
+                        "color": "yellow",
+                        "positions": [(9,12), (9,13), (9,14)]
+                    }
+                ]),
+                walls(game, [
+                    ".....................",
+                    "......xx......xx.....",
+                    "......xx.....xxx.....",
+                    "..o.o.x.......x......",
+                    "..obo................",
+                    ".....................",
+                    ".xxx.................",
+                    ".xx...........xx.....",
+                    ".............xxx.....",
+                    ".xx...........xx.xxx.",
+                    ".xx.....x.oo.....xxx.",
+                    "..x....xx.o.......xx.",
+                    "..........oo.........",
+                    "..........xx.........",
+                    "..........x.......xx.",
+                    "..........xxx....xxx.",
+                    ".....................",
+                ]),
+            ])
 
 
     def begin(self, game):
@@ -772,13 +874,11 @@ class ever_maze:
 
     def press_button(self, game, button):
 
-        if self.previous_button == button.name and game.move != 0:
+        if button.previous_button == button.name and game.move != 0:
             return
         
         if button.name not in ["up", "down", "left", "right"]:
             return
-        
-        self.previous_button = button.name
 
         for patrol in game.find_all("patrols"):
             patrol.move(game)

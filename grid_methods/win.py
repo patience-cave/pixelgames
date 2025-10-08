@@ -16,7 +16,7 @@ def win(self):
 
     for i in spots:
         for j in i:
-            self.set(j, win_color, _resolution=False, _origin=False, _fast=True)
+            self.set(j, win_color, _resolution=False, _origin=False, _fast=False)
         self.next_frame()
 
     
