@@ -79,7 +79,7 @@
             "origin": [12, 12],
             "board_size": [8, 8],
             "background": "gray",
-            "max_moves": 100,
+            "max_moves": 32,
             "objects": {
                 "floor": {},
                 "snakes": {

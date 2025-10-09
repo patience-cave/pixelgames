@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>Tap a Block to Turn It White</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <style>
     html, body {
       height: 100%;
@@ -11,6 +11,14 @@
       margin: 0;
       color: #eaeaea;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+      overflow: hidden;
+      touch-action: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
     header {
       padding: 10px 16px;
@@ -51,6 +59,7 @@
       width: 100%; height: 100%;
       image-rendering: pixelated;
       cursor: pointer;
+      touch-action: none;
     }
     #controls {
       display: flex;
@@ -81,6 +90,7 @@
       align-items: center;
       justify-content: center;
       font-weight: 500;
+      touch-action: none;
     }
     .control-btn:hover {
       background: linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 100%);
@@ -605,6 +615,58 @@ import sys, pkgutil, os
       }
     });
 
+    // Prevent context menu on long press (mobile)
+    canvas.addEventListener("contextmenu", (ev) => {
+      ev.preventDefault();
+    });
+
+    // Prevent double-tap zoom on mobile
+    let lastTouchEnd = 0;
+    canvas.addEventListener("touchend", (ev) => {
+      const now = (new Date()).getTime();
+      if (now - lastTouchEnd <= 300) {
+        ev.preventDefault();
+      }
+      lastTouchEnd = now;
+    });
+
+    // Handle touch events for mobile interaction
+    canvas.addEventListener("touchstart", (ev) => {
+      if (ev.touches.length > 1) {
+        // Prevent zoom gestures
+        ev.preventDefault();
+      } else if (ev.touches.length === 1) {
+        // Handle single touch for game interaction
+        ev.preventDefault();
+        const touch = ev.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
+        const hit = cellAt(x, y);
+        if (!hit) return;
+        const [r, c] = hit;
+        
+        // Start click animation at the center of the clicked cell
+        const cellRect = rects[r][c];
+        const centerX = cellRect.x + cellRect.w / 2;
+        const centerY = cellRect.y + cellRect.h / 2;
+        startClickAnimation(centerX, centerY);
+        
+        // Disable hover and clear the hovered cell
+        hoverEnabled = false;
+        hoveredCell = null;
+        
+        // Send to Python: position = [c, r]
+        pyodide.runPython(`py_press_tile(${c}, ${r})`);
+      }
+    });
+
+    canvas.addEventListener("touchmove", (ev) => {
+      if (ev.touches.length > 1) {
+        ev.preventDefault();
+      }
+    });
+
     const keyMap = {
       " ": "space",
       "a": "left", "A": "left",
@@ -638,7 +700,17 @@ import sys, pkgutil, os
     };
 
     Object.entries(controlButtons).forEach(([id, action]) => {
-      document.getElementById(id).addEventListener("click", () => {
+      const button = document.getElementById(id);
+      
+      // Handle click events
+      button.addEventListener("click", () => {
+        if (!boardReady) return;
+        pyodide.runPython(`py_press_button("${action}")`);
+      });
+      
+      // Handle touch events for mobile
+      button.addEventListener("touchstart", (ev) => {
+        ev.preventDefault();
         if (!boardReady) return;
         pyodide.runPython(`py_press_button("${action}")`);
       });
