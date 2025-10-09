@@ -1,6 +1,8 @@
 from game_template import game_template
-from useful_objects import levels_left, moves_left
+from useful_objects import levels_left, moves_left, on_board
 from helper import iterate_over_2D, lists_match
+
+
 
 class border:
     def __init__(self, game, input={}):
@@ -30,6 +32,7 @@ class floor:
             for j in range(0, game.board_size[1]):
                 game.set((i, j), "floor")
 
+
 class portals:
     def __init__(self, game, input={}):
         self.id = "portals"
@@ -52,44 +55,31 @@ class portals:
             if lists_match(right, position):
                 return left
 
-class half_exploders:
+
+
+class half_exploders(on_board):
     def __init__(self, game, input={}):
+        super().__init__(game, input)
         self.id = "half_exploders"
         self.colors = {
             "half_exploder": "yellow"
         }
-        self.positions = input.get("positions") or []
-    
-    def render(self, game):
-        for position in self.positions:
-            game.set(position, "half_exploder")
 
-
-class inverters:
+class inverters(on_board):
     def __init__(self, game, input={}):
+        super().__init__(game, input)
         self.id = "inverters"
         self.colors = {
             "inverter": "dark green"
         }
-        self.positions = input.get("positions") or []
-    
-    def render(self, game):
-        for position in self.positions:
-            game.set(position, "inverter")
 
-
-class walls:
+class walls(on_board):
     def __init__(self, game, input={}):
+        super().__init__(game, input)
         self.id = "walls"
         self.colors = {
             "wall": "black"
         }
-        self.positions = input.get("positions") or []
-    
-    def render(self, game):
-        for position in self.positions:
-            game.set(position, "wall")
-
 
 
 class fruits:
@@ -97,7 +87,7 @@ class fruits:
         self.id = "fruits"
         self.colors = {
             "active fruit": "red",
-            "inactive fruit": "black"
+            "inactive fruit": "very dark red"
         }
         positions = input["positions"]
         self.active_fruit = positions[0]
@@ -155,14 +145,14 @@ class snake:
 
         next_spot = game.get(new_head)
 
-        if next_spot == "floor":
+        if next_spot.startswith("floor"):
             pass
-        elif next_spot == "active fruit":
+        elif next_spot.startswith("active fruit"):
             pass
-        elif next_spot == "portal":
+        elif next_spot.startswith("portal"):
             game.set(new_head, "body")
             new_head = game.find_object("portals").portal_spawn(game, new_head)
-        elif next_spot == "half_exploder":
+        elif next_spot.startswith("half_exploder"):
             game.set(new_head, "head")
             game.next_frame()
 
@@ -174,7 +164,7 @@ class snake:
             self.body.append(new_head)
             self.head = new_head
             return
-        elif next_spot == "inverter":
+        elif next_spot.startswith("inverter"):
 
             game.set(new_head, "head")
             game.next_frame()
@@ -202,7 +192,7 @@ class snake:
         game.set(self.body[-2], "body")
         game.set(self.head, "head")
 
-        if next_spot == "active fruit":
+        if next_spot.startswith("active fruit"):
             game.find_object("fruits").collect(game)
 
         # if new_head == (5,5):

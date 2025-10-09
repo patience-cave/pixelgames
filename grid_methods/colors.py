@@ -18,6 +18,7 @@ _color_to_rgb = {
     "dark red": (150, 0, 0),
     "pink": (255, 105, 180),
     "soft blue": (115, 144, 250),
+    "very dark red": (50, 0, 0),
 }
 
 

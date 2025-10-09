@@ -1,5 +1,15 @@
 from helper import chunk_list_avg_size
 
+class on_board:
+    def __init__(self, game, input={}):
+        self.positions = input.get("positions") or []
+    
+    def render(self, game):
+        for position in self.positions:
+            game.set(position, list(self.colors.keys())[0])
+
+
+
 class levels_left:
     def __init__(self, game):
         self.id = "levels_left"
