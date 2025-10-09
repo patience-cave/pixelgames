@@ -92,7 +92,11 @@ def set(self, _position, _to, _resolution=None, _origin=None, _fast=False):
     origin = [i * j for i,j in zip(_position, _resolution)]
     for i in range(_resolution[0]):
         for j in range(_resolution[1]):
-            positions.append((origin[0] + i + _origin[0], origin[1] + j + _origin[1]))
+            x = origin[0] + i + _origin[0]
+            y = origin[1] + j + _origin[1]
+            if x < 0 or y < 0:
+                continue
+            positions.append((x, y))
 
     for position in positions:
 

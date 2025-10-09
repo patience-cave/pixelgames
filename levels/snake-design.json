@@ -1,8 +1,28 @@
 {
-    "max_levels": 8,
-    "level": 6,
+    "max_levels": 10,
+    "level": 1,
     "background": "black",
     "levels": [
+        {
+            "resolution": [6, 6],
+            "origin": [11, 11],
+            "board_size": [7, 7],
+            "background": "gray",
+            "max_moves": 33,
+            "objects": {
+                "floor": {},
+                "snakes": {
+                    "snakes": [
+                        {
+                            "positions": [[3,1]]
+                        }
+                    ]
+                },
+                "fruits": {
+                    "positions": [[1, 3], [5, 3], [3, 3], [3, 5], [3, 0]]
+                }
+            }
+        },
         {
             "resolution": [6, 6],
             "origin": [14, 14],
@@ -105,6 +125,55 @@
             "origin": [12, 12],
             "board_size": [8, 8],
             "background": "gray",
+            "max_moves": 44,
+            "objects": {
+                "floor": {},
+                "snakes": {
+                    "snakes": [
+                        {
+                            "positions": [[3, 4]]
+                        }
+                    ]
+                },
+                "fruits": {
+                    "positions": [[0, 2], [7, 2], [6, 6], [4, 0], [0, 7]]
+                },
+                "inverters": {
+                    "positions": [[2, 1]]
+                }
+            }
+        },
+        {
+            "resolution": [6, 6],
+            "origin": [11, 11],
+            "board_size": [7, 7],
+            "background": "gray",
+            "max_moves": 24,
+            "objects": {
+                "floor": {},
+                "snakes": {
+                    "snakes": [
+                        {
+                            "positions": [[1, 1]]
+                        },
+                        {
+                            "positions": [[1, 5]]
+                        }
+                    ]
+                },
+                "fruits": {
+                    "positions": [[5, 1], [3, 6], [3, 0], [3, 2]]
+                },
+                "walls": {
+                    "positions": [[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3]]
+                }
+            }
+        },
+        {
+            "resolution": [5, 5],
+            "origin": [12, 12],
+            "board_size": [8, 8],
+            "background": "gray",
             "max_moves": 31,
             "objects": {
                 "floor": {},
@@ -127,8 +196,31 @@
             }
         },
         {
-            "resolution": [5, 5],
-            "origin": [12, 12],
+            "resolution": [6, 6],
+            "origin": [11, 11],
+            "board_size": [7, 7],
+            "background": "gray",
+            "max_moves": 39,
+            "objects": {
+                "floor": {},
+                "snakes": {
+                    "snakes": [
+                        {
+                            "positions": [[0,3]]
+                        }
+                    ]
+                },
+                "fruits": {
+                    "positions": [[6, 3], [2, 0], [3, 6], [4, 0]]
+                },
+                "half_exploders": {
+                    "positions": [[1, 6]]
+                }
+            }
+        },
+        {
+            "resolution": [6, 6],
+            "origin": [11, 5],
             "board_size": [7, 9],
             "background": "gray",
             "max_moves": 59,
