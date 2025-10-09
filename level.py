@@ -2,16 +2,19 @@
 try:
     from levels.as66 import as66_game
     from levels.snake import snake_game
+    from levels.shadow import shadow_game
 except ImportError:
     from as66 import as66_game
     from snake import snake_game
-
+    from shadow import shadow_game
 
 def choose_game(game_name, game):
     if game_name == "snake":
         return snake_game(game)
     elif game_name == "as66":
         return as66_game(game)
+    elif game_name == "shadow":
+        return shadow_game(game)
     else:
         raise ValueError(f"Invalid game name: {game_name}")
 

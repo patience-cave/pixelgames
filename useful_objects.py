@@ -10,6 +10,45 @@ class on_board:
 
 
 
+class border:
+    def __init__(self, game, input={}):
+        self.id = "border"
+        border_color = input.get("border_color") or "black"
+        self.colors = {
+            "border": border_color
+        }
+    
+    def render(self, game):
+        if "board_size" not in game:
+            print("game needs a board size to render the border")
+            return
+        for i in range(-1, game.board_size[0]+1):
+            game.set((i, -1), "border")
+            game.set((i, game.board_size[1]), "border")
+        for i in range(-1, game.board_size[1]+1):
+            game.set((-1, i), "border")
+            game.set((game.board_size[0], i), "border")
+
+class floor:
+    def __init__(self, game, input={}):
+        self.id = "floor"
+        floor_color = input.get("floor_color") or "light gray"
+        self.colors = {
+            "floor": floor_color
+        }
+
+    def render(self, game):
+        if "board_size" not in game:
+            print("game needs a board size to render the border")
+            return
+        for i in range(0, game.board_size[0]):
+            for j in range(0, game.board_size[1]):
+                game.set((i, j), "floor")
+
+
+
+
+
 class levels_left:
     def __init__(self, game):
         self.id = "levels_left"

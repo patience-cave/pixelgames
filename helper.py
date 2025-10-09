@@ -3,8 +3,24 @@
 import math
 
 
+def diagonals(size):
+    """Generate diagonals (x, y) for a grid of size [width, height]."""
+    width, height = size[0], size[1]
+    diags = []
+    for s in range(width + height - 1):
+        diag = []
+        for x in range(width):
+            y = s - x
+            if 0 <= y < height:
+                diag.append([x, y])
+        diags.append(diag)
+    return diags
+
 def lists_match(list1, list2):
     return set(i == j for i, j in zip(list1, list2)) == { True }
+
+def position_in_bounds(game, position):
+    return position[0] >= 0 and position[0] < game.board_size[0] and position[1] >= 0 and position[1] < game.board_size[1]
 
     
 def iterate_over_2D(string_list):
@@ -20,6 +36,20 @@ def iterate_over_2D(string_list):
             yield (x, y, j)
             x += 1
 
+def sort_objects_by_positions(objects, positions, dx, dy):
+    # Pair positions with objects
+    paired = list(zip(positions, objects))
+    
+    # Sort by x-direction
+    if dx != 0:
+        paired.sort(key=lambda p: p[0][0], reverse=(dx > 0))
+    
+    # Sort by y-direction
+    if dy != 0:
+        paired.sort(key=lambda p: p[0][1], reverse=(dy > 0))
+    
+    # Return only the objects, in the new order
+    return [obj for _, obj in paired]
 
 
 def chunk_list_avg_size(lst, target):

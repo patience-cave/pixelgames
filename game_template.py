@@ -36,6 +36,13 @@ class game_template:
                 continue
             game[item] = level_data[item]
 
+        # automatically calculate origin
+        if "origin" not in level_data and "board_size" in level_data:
+            game.origin = [
+                (game.actual_size[0] - level_data["board_size"][0] * game.resolution[0]) // 2,
+                (game.actual_size[1] - level_data["board_size"][1] * game.resolution[1]) // 2
+            ]
+
         objects = level_data["objects"]
 
         unseen_objects = list(game.list_of_objects.keys())

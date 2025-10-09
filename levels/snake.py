@@ -9,7 +9,6 @@ class border:
         self.id = "border"
         self.colors = {
             "border": "black",
-            "floor": "light gray"
         }
     
     def render(self, game):

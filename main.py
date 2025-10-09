@@ -3,13 +3,15 @@ import pygame
 from grid import grid_stateful
 from level import choose_game
 
+THE_GAME = "shadow"
+
 class game:
 
     def __init__(self, margin_px=1, block_bx=10):
 
         self.board = grid_stateful()
 
-        chosen_game = choose_game("snake", self.board)
+        chosen_game = choose_game(THE_GAME, self.board)
         self.board.level = chosen_game
 
         # self.board.begin_method = chosen_game.begin

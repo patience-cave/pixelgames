@@ -1,0 +1,139 @@
+{
+    "max_levels": 10,
+    "level": 1,
+    "background": "black",
+    "levels": [
+        {
+            "resolution": [5, 5],
+            "board_size": [9, 9],
+            "max_moves": 100,
+            "objects": {
+                "floor": {},
+                "characters": {
+                    "characters": [
+                        {
+                            "position": [1, 1],
+                            "on_layer": 0
+                        }
+                    ]
+                },
+                "objects": {
+                    "layers": [
+                        [
+                            "ooo......",
+                            "ooo....e.",
+                            "ooo......",
+                            "xxxxxxxxx",
+                            "xxxxxxxxx",
+                            "xxxxxxxxx",
+                            "......ooo",
+                            "......ooo",
+                            "......ooo"
+                        ],
+                        [
+                            "oooxxx...",
+                            "oooxxx...",
+                            "oooxxx...",
+                            "...xxx...",
+                            "...xxx...",
+                            "...xxx...",
+                            "......ooo",
+                            "......ooo",
+                            "......ooo"
+                        ]
+                    ]
+                }
+            }
+        },
+        {
+            "resolution": [3, 3],
+            "board_size": [15, 15],
+            "max_moves": 100,
+            "objects": {
+                "floor": {},
+                "characters": {
+                    "characters": [
+                        {
+                            "position": [7, 7],
+                            "on_layer": 0
+                        }
+                    ]
+                },
+                "objects": {
+                    "layers": [
+                        [
+                            "ooo...oooxxxooo",
+                            "ooo...oooxxxooo",
+                            "ooo...oooxxxooo",
+                            "xxxxxxxxxxxx...",
+                            "xxxxxxxxxxxx...",
+                            "xxxxxxxxxxxx...",
+                            "xxxooo...oooxxx",
+                            "xxxooo...oooxxx",
+                            "xxxooo...oooxxx",
+                            "...xxxxxxxxxxxx",
+                            "...xxxxxxxxxxxx",
+                            "...xxxxxxxxxxxx",
+                            "oooxxxooo...ooo",
+                            "oooxxxooo...ooo",
+                            "oooxxxooo...ooo"
+                        ],
+                        [
+                            "oooxxxooo...ooo",
+                            "oooxxxooo...ooo",
+                            "oooxxxooo...ooo",
+                            "...xxxxxx...xxx",
+                            ".e.xxxxxx...xxx",
+                            "...xxxxxx...xxx",
+                            "xxxoooxxxoooxxx",
+                            "xxxoooxxxoooxxx",
+                            "xxxoooxxxoooxxx",
+                            "xxx...xxxxxx...",
+                            "xxx...xxxxxx.e.",
+                            "xxx...xxxxxx...",
+                            "ooo...oooxxxooo",
+                            "ooo...oooxxxooo",
+                            "ooo...oooxxxooo"
+                        ]
+                    ]
+                }
+            }
+        },
+        {
+            "resolution": [3, 3],
+            "board_size": [4, 4],
+            "max_moves": 100,
+            "objects": {
+                "floor": {},
+                "characters": {
+                    "characters": [
+                        {
+                            "position": [0, 0],
+                            "on_layer": 0
+                        },
+                        {
+                            "position": [0, 0],
+                            "on_layer": 1
+                        }
+                    ]
+                },
+                "objects": {
+                    "layers": [
+                        [
+                            "...o",
+                            "....",
+                            "....",
+                            "...."
+                        ],
+                        [
+                            "...o",
+                            "....",
+                            "....",
+                            "...."
+                        ]
+                    ]
+                }
+            }
+        }
+    ]
+}
