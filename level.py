@@ -8,7 +8,12 @@ except ImportError:
 
 
 def choose_game(game_name, game):
-    return snake_game(game)
+    if game_name == "snake":
+        return snake_game(game)
+    elif game_name == "as66":
+        return as66_game(game)
+    else:
+        raise ValueError(f"Invalid game name: {game_name}")
 
 
 

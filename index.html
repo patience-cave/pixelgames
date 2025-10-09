@@ -117,6 +117,26 @@
     }
     a { color: #8ac6ff; text-decoration: none; }
     a:hover { text-decoration: underline; }
+    .level-picker { position: relative; }
+    .level-button {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #232323; border: 1px solid #3a3a3a; color: #eaeaea;
+      padding: 6px 12px; border-radius: 999px; cursor: pointer; font-weight: 600;
+    }
+    .level-button:hover { background: #2b2b2b; }
+    .level-menu {
+      position: absolute; top: 100%; left: 0; margin-top: 8px; min-width: 160px;
+      background: #1a1a1a; border: 1px solid #2f2f2f; border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35); list-style: none; padding: 6px; display: none; z-index: 10;
+    }
+    .level-menu.open { display: block; }
+    .level-menu li {
+      padding: 8px 10px; border-radius: 8px; cursor: pointer;
+    }
+    .level-menu li:hover { background: #2a2a2a; }
+    .level-menu li[aria-selected="true"] {
+      background: #2f2f2f; outline: 1px solid #3f3f3f;
+    }
   </style>
   <!-- Pyodide loads Python in the browser. The CDN version here is broadly compatible. -->
   <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
@@ -124,7 +144,15 @@
 <body>
   <div id="container">
     <header>
-      <strong>Welcome to Puzzle 1</strong>
+      <div class="level-picker">
+        <button id="level-button" class="level-button" aria-haspopup="listbox" aria-expanded="false">
+          <span id="level-current">snake</span>
+          <svg width="14" height="14" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 7l5 6 5-6z" fill="currentColor"/></svg>
+        </button>
+        <ul id="level-menu" class="level-menu" role="listbox" aria-activedescendant="">
+          <!-- Filled by JS from LEVELS -->
+        </ul>
+      </div>
       <span class="status" id="status">loading Python…</span>
     </header>
     <div id="game-area">
@@ -150,6 +178,8 @@
     // Python bridge via Pyodide
     // --------------------------
     let pyodide, boardReady = false;
+    const LEVELS = ["snake", "as66"];
+    let currentLevel = "snake";
 
     const time = (label) => ({
   start: () => console.time(label),
@@ -247,31 +277,41 @@ print("sys.path:", sys.path)
 from grid import grid_stateful
 from level import choose_game
 
-board = grid_stateful()
-chosen_game = choose_game("snake", board)
-board.level = chosen_game
-board.input({"event": "init"})
+board = None
+
+def py_new_board(level_name: str):
+    global board
+    board = grid_stateful()
+    chosen_game = choose_game(level_name, board)
+    board.level = chosen_game
+    board.input({"event": "init"})
+    return True
 
 def py_get_size():
-    return tuple(board.actual_size)
+    return tuple(board.actual_size) if board is not None else (0, 0)
 
 def py_get_color_grid():
-    return board.input("color_grid")
+    return board.input("color_grid") if board is not None else []
 
 def py_begin():
-    board.input({"event": "begin"})
+    if board is not None:
+        board.input({"event": "begin"})
 
 def py_press_tile(c, r):
-    return board.input({"event": "press_tile", "position": [c, r]})
+    if board is not None:
+        return board.input({"event": "press_tile", "position": [c, r]})
 
 def py_press_button(name):
-    return board.input({"event": "press_button", "button": name})
+    if board is not None:
+        return board.input({"event": "press_button", "button": name})
 
 def py_update():
+    if board is None:
+        return [], False
     out = list(board.input("update"))
     anim = bool(getattr(board, "animations", None) or (getattr(board, "board", None) and getattr(board.board, "animations", False)))
     return out, anim
-    `);
+`);
     tPy.end();
   } catch (err) {
     console.error("🔻 Python execution failed. Full traceback above from stderr.", err);
@@ -435,6 +475,8 @@ import sys, pkgutil, os
     async function bootstrap() {
       await loadPython();
 
+      await setLevel(currentLevel); // initial level
+
       // Read board size from Python and set up grid
       // py_get_size returns (width, height) in tiles
       const [width, height] = pyodide.runPython("py_get_size()");
@@ -478,6 +520,35 @@ import sys, pkgutil, os
       // Start both loops
       gameLogicLoop();  // Game logic at 50ms intervals
       animationLoop();  // Smooth animations at 60fps
+    }
+
+    async function setLevel(level) {
+      console.log("Setting level to", level);
+      currentLevel = level;
+      // 1) Re-create the Python board for this level
+      await pyodide.runPythonAsync(`py_new_board("${level}")`);
+      
+      // 2) Pull size and colors anew
+      const [width, height] = pyodide.runPython("py_get_size()");
+      N_COLS = width; N_ROWS = height;
+      INITIAL_SIZE = [N_COLS * BLOCK_BX, N_ROWS * BLOCK_BX];
+
+      const pyColors = pyodide.runPython("py_get_color_grid()");
+      colors = pyColors.toJs({ create_proxies: false });
+
+      // 3) Rebuild layout + rects + fresh fade-in
+      rects = buildRects();
+      // Reset opacity so new grid fades in
+      tileOpacity = Array.from({ length: N_ROWS }, () => Array(N_COLS).fill(0));
+      drawAll();
+      resizeToContainer();
+      animateTilesFadeIn();
+
+      // 4) Begin level logic
+      pyodide.runPython("py_begin()");
+
+      // 5) Update UI text
+      document.getElementById("level-current").textContent = level;
     }
 
     // Fade in tiles with a diagonal wave pattern
@@ -714,6 +785,55 @@ import sys, pkgutil, os
         if (!boardReady) return;
         pyodide.runPython(`py_press_button("${action}")`);
       });
+    });
+
+    // ----- Level dropdown wiring -----
+    const levelBtn = document.getElementById("level-button");
+    const levelMenu = document.getElementById("level-menu");
+    const levelCurrent = document.getElementById("level-current");
+
+    // Build menu items from LEVELS
+    function buildLevelMenu() {
+      levelMenu.innerHTML = "";
+      for (const name of LEVELS) {
+        const li = document.createElement("li");
+        li.textContent = name;
+        li.id = `level-${name}`;
+        li.setAttribute("role", "option");
+        li.setAttribute("aria-selected", name === currentLevel ? "true" : "false");
+        li.addEventListener("click", async () => {
+          if (!boardReady) return;
+          // Close menu
+          levelMenu.classList.remove("open");
+          levelBtn.setAttribute("aria-expanded", "false");
+
+          // Only act if changed
+          if (name !== currentLevel) {
+            // Show transient status
+            document.getElementById("status").textContent = `loading ${name}…`;
+            await setLevel(name);
+            document.getElementById("status").textContent = "ready";
+            // update selected visuals
+            levelMenu.querySelectorAll("li[aria-selected]").forEach(n => n.setAttribute("aria-selected", "false"));
+            li.setAttribute("aria-selected", "true");
+          }
+        });
+        levelMenu.appendChild(li);
+      }
+    }
+    buildLevelMenu();
+
+    levelBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const open = levelMenu.classList.toggle("open");
+      levelBtn.setAttribute("aria-expanded", String(open));
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!levelMenu.contains(e.target) && e.target !== levelBtn) {
+        levelMenu.classList.remove("open");
+        levelBtn.setAttribute("aria-expanded", "false");
+      }
     });
 
     // --------------------------
