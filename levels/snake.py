@@ -52,6 +52,18 @@ class portals:
             if lists_match(right, position):
                 return left
 
+class half_exploders:
+    def __init__(self, game, input={}):
+        self.id = "half_exploders"
+        self.colors = {
+            "half_exploder": "yellow"
+        }
+        self.positions = input.get("positions") or []
+    
+    def render(self, game):
+        for position in self.positions:
+            game.set(position, "half_exploder")
+
 
 class inverters:
     def __init__(self, game, input={}):
@@ -150,6 +162,18 @@ class snake:
         elif next_spot == "portal":
             game.set(new_head, "body")
             new_head = game.find_object("portals").portal_spawn(game, new_head)
+        elif next_spot == "half_exploder":
+            game.set(new_head, "head")
+            game.next_frame()
+
+            for position in self.body[::-1][::2]:
+                game.set(position, "floor")
+                game.next_frame()
+
+            self.body = self.body[::-1][::2]
+            self.body.append(new_head)
+            self.head = new_head
+            return
         elif next_spot == "inverter":
 
             game.set(new_head, "head")
@@ -201,7 +225,8 @@ class snake_game(game_template):
             "fruits": fruits,
             "portals": portals,
             "inverters": inverters,
-            "walls": walls
+            "walls": walls,
+            "half_exploders": half_exploders
         }
 
     def press_button(self, game, button):
