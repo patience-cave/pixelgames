@@ -38,7 +38,7 @@ class game_template:
 
         objects = level_data["objects"]
 
-        unseen_objects = set(game.list_of_objects.keys())
+        unseen_objects = list(game.list_of_objects.keys())
         _objects = []
 
         for object_type in objects:
@@ -53,7 +53,8 @@ class game_template:
             _objects.append(o)
 
             if object_type in unseen_objects:
-                unseen_objects.remove(object_type)
+                # remove object_type from unseen_objects
+                unseen_objects = [o for o in unseen_objects if o != object_type]
 
         for object_type in unseen_objects:
             object_class = game.list_of_objects[object_type]
