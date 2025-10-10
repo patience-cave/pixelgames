@@ -59,6 +59,7 @@ def chunk_list_avg_size(lst, target):
     The final chunk may be smaller, but never larger than ceil(target).
     """
     if target <= 1:
+        return chunk_list_avg_size_1(lst, target)
         # Smallest sensible chunk is 1; clamp tiny/invalid targets
         step = 1
         frac = 0.0
@@ -98,5 +99,46 @@ def chunk_list_avg_size(lst, target):
 
         final_chunk = chunks.pop()
         chunks[-1] += final_chunk
+
+    return chunks
+
+
+import math
+
+def chunk_list_avg_size_1(lst, target):
+    """
+    Split `lst` into chunks whose sizes average ≈ `target` (float).
+
+    Works for any target > 0, including target < 1.
+    - Uses an accumulator so every step's chunk size is either floor(target) or ceil(target).
+    - When target < 1, zero-length chunks are emitted to maintain the average (e.g., 1,0,1,0,...).
+    - The final chunk will not overrun `lst` (it's clipped to remaining elements).
+
+    Returns: list of slices from `lst`; some may be empty if target < 1.
+    """
+    if target <= 0:
+        raise ValueError("target must be > 0")
+
+    chunks = []
+    i = 0                 # number of items already consumed from lst
+    acc = 0.0             # accumulates the target rate
+
+    # Keep stepping until we've consumed all elements.
+    # Each step decides how many *new* items to consume this round.
+    while i < len(lst):
+        acc += target
+        should_have_eaten = int(math.floor(acc))
+        k = should_have_eaten - i            # how many items to take now (can be 0 or more)
+        if k < 0:
+            k = 0
+        # Don't overrun the end
+        remaining = len(lst) - i
+        k = min(k, remaining)
+
+        # Append the (possibly empty) chunk and advance by k
+        chunks.append(lst[i:i+k])
+        i += k
+
+        # If k == 0, we still made progress in time (via acc) and will eventually take 1 on a future step.
 
     return chunks

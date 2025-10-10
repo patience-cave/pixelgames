@@ -100,19 +100,19 @@
             }
         },
         {
-            "resolution": [3, 3],
-            "board_size": [4, 4],
-            "max_moves": 100,
+            "resolution": [2, 2],
+            "board_size": [25, 25],
+            "max_moves": 1000,
             "objects": {
                 "floor": {},
                 "characters": {
                     "characters": [
                         {
-                            "position": [0, 0],
+                            "position": [2, 2],
                             "on_layer": 0
                         },
                         {
-                            "position": [0, 0],
+                            "position": [22, 22],
                             "on_layer": 1
                         }
                     ]
@@ -120,16 +120,122 @@
                 "objects": {
                     "layers": [
                         [
-                            "...o",
-                            "....",
-                            "....",
-                            "...."
+                            "xxxxxxxxxxxxxxxxxxxxxxxxx",
+                            "xoooxxooo.......oooxxxxxx",
+                            "xoooxxooo.......oooxxxxxx",
+                            "xoooxxooo.......oooxxxxxx",
+                            "x...xxxxxxxxxxxxxxxxxxxxx",
+
+                            "x...xxxxxxxxxxxxxxxxxxxxx",
+                            "x...xx.............xxooox",
+                            "x...xx.............xxooox",
+                            "x...xx.............xxooox",
+                            "x...xx...xxxxxxx...xx...x",
+
+                            "x...xx...xxxxxxx...xx...x",
+                            "x...xxoooxxoooxxoooxx...x",
+                            "x.e.xxoooxxoooxxoooxx...x",
+                            "x...xxoooxxoooxxoooxx...x",
+                            "xxxxxxxxxxxxxxxxxxxxx...x",
+
+                            "xxxxxxxxxxxxxxxxxxxxx...x",
+                            "xoooxx........xxooo..ooox",
+                            "xoooxx.e......xxooo..ooox",
+                            "xoooxx........xxooo..ooox",
+                            "x...xxxxxxx...xxxxxxxxxxx",
+
+                            "x...xxxxxxx...xxxxxxxxxxx",
+                            "x.....oooxx..........ooox",
+                            "x.....oooxx..........ooox",
+                            "x.....oooxx..........ooox",
+                            "xxxxxxxxxxxxxxxxxxxxxxxxx"
+
                         ],
                         [
-                            "...o",
-                            "....",
-                            "....",
-                            "...."
+                            "xxxxxxxxxxxxxxxxxxxxxxxxx",
+                            "xoooxxooo.....xxooo.....x",
+                            "xoooxxooo...e.xxooo.....x",
+                            "xoooxxooo.....xxooo.....x",
+                            "x...xxxxxxxxxxxxxxxxx...x",
+
+                            "x...xxxxxxxxxxxxxxxxx...x",
+                            "x..................xxooox",
+                            "x..................xxooox",
+                            "x..................xxooox",
+                            "x...xxxxxxxxxxxx...xxxxxx",
+
+                            "x...xxxxxxxxxxxx...xxxxxx",
+                            "x...xxoooxxoooxxooo.....x",
+                            "x...xxoooxxoooxxooo.....x",
+                            "x...xxoooxxoooxxooo.....x",
+                            "x...xx...xx...xxxxxxxxxxx",
+
+                            "x...xx...xx...xxxxxxxxxxx",
+                            "xoooxx...xx...xxoooxxooox",
+                            "xoooxx.e.xx...xxoooxxooox",
+                            "xoooxx...xx...xxoooxxooox",
+                            "xxxxxxxxxxx...xxxxxxx...x",
+
+                            "xxxxxxxxxxx...xxxxxxx...x",
+                            "xxxxxxooo..........xxooox",
+                            "xxxxxxooo........e.xxooox",
+                            "xxxxxxooo..........xxooox",
+                            "xxxxxxxxxxxxxxxxxxxxxxxxx"
+
+                        ]
+                    ]
+                }
+            }
+        },
+        {
+            "resolution": [2, 2],
+            "board_size": [21, 15],
+            "max_moves": 1000,
+            "objects": {
+                "floor": {},
+                "characters": {
+                    "characters": [
+                        {
+                            "position": [10, 1],
+                            "on_layer": 0
+                        }
+                    ]
+                },
+                "objects": {
+                    "layers": [
+                        [
+                            "oooxxxoooxxxoooxxxooo",
+                            "oooxxxoooxxxoooxxxooo",
+                            "oooxxxoooxxxoooxxxooo",
+                            "...xxx...xxx...xxx...",
+                            "...xxx...xxx...xxx...",
+                            "...xxx...xxx...xxx...",
+                            ".....................",
+                            ".....................",
+                            ".....................",
+                            "xxxxxxxxx...xxxxxxxxx",
+                            "xxxxxxxxx...xxxxxxxxx",
+                            "xxxxxxxxx...xxxxxxxxx",
+                            "ooo...xxx...xxx...ooo",
+                            "ooo.e.xxx...xxx.e.ooo",
+                            "ooo...xxx...xxx...ooo"
+                        ],
+                        [
+                            "ooo.x....xxx...xxx...",
+                            "oooxxx...xo......x...",
+                            "oooxo....xxx...xxx...",
+                            "...xxx....x.....x....",
+                            "....x....xxx...xxx...",
+                            "...xxx...xx....xo....",
+                            ".....x...xxx...xxx...",
+                            ".e.xxx....ox.e..x....",
+                            "....x....xxx...xxx.e.",
+                            "...xxx...x......x....",
+                            "...xo..e.xxx...xxx...",
+                            "...xxx...xxx...xxx...",
+                            "oooxxxxxxxxxxxxxxxooo",
+                            "ooo....oxxo.......ooo",
+                            "oooxxxxxxxxxxxxxxxooo"
                         ]
                     ]
                 }

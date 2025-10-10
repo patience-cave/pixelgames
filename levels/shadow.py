@@ -3,7 +3,6 @@ from useful_objects import levels_left, moves_left, on_board, border, floor
 from helper import iterate_over_2D, lists_match, sort_objects_by_positions, diagonals, position_in_bounds
 
 
-
 class objects:
     def __init__(self, game, input={}):
         self.id = "objects"
@@ -44,8 +43,12 @@ class objects:
     def reach_exit(self, game, position):
         # remove this position from the exit list
         self.layers[game.current_layer]["exits"].remove(position)
-        if self.layers[game.current_layer]["exits"] == []:
-            game.win = True
+
+        game.win = True
+        for layer in self.layers:
+            if layer["exits"] != []:
+                game.win = False
+                break
 
     def get_object(self, game, position):
         for object_type in self.layers[game.current_layer]:
@@ -86,11 +89,13 @@ class objects:
 
         for positions in diags:
             for position in positions:
-                if _characters.player_at(game, position):
-                    game.set(position, "character")
-                else:
-                    game.set(position, self.get_object(game, position))
-            #game.next_frame()
+                game.set(position, self.get_object(game, position))
+        
+        # when a character swaps layers, set what it's stepping on to be what it is standing on now
+        for character in _characters.all_characters_on_layer(game):
+            should_step_on = game.get(character["position"])
+            game.set(character["position"], "character")
+            character["stepping_on"] = should_step_on
 
 
 
@@ -127,6 +132,11 @@ class characters:
         positions = [character["position"] for character in self.characters]
         for character in sort_objects_by_positions(self.characters, positions, dx, dy):
 
+            if character["stepping_on"] == "wall":
+                game.set(character["position"], "wall")
+                game.lose = True
+                return
+                
             # do not move character if they are not on the current layer
             if character["on_layer"] != game.current_layer:
                 continue
