@@ -100,6 +100,52 @@
             }
         },
         {
+            "resolution": [5, 5],
+            "board_size": [9, 9],
+            "max_moves": 100,
+            "objects": {
+                "floor": {},
+                "characters": {
+                    "characters": [
+                        {
+                            "position": [1, 4],
+                            "on_layer": 0
+                        },
+                        {
+                            "position": [7, 4],
+                            "on_layer": 0
+                        }
+                    ]
+                },
+                "objects": {
+                    "layers": [
+                        [
+                            "oooxxx...",
+                            "oooxxx...",
+                            "oooxxx...",
+                            "...xxx...",
+                            "...xxx...",
+                            "...xxx...",
+                            "...xxxooo",
+                            "...xxxooo",
+                            "...xxxooo"
+                        ],
+                        [
+                            "ooo......",
+                            "ooo....e.",
+                            "ooo......",
+                            "xxxxxxxxx",
+                            "xxxxxxxxx",
+                            "xxxxxxxxx",
+                            "......ooo",
+                            ".e....ooo",
+                            "......ooo"
+                        ]
+                    ]
+                }
+            }
+        },
+        {
             "resolution": [2, 2],
             "board_size": [25, 25],
             "max_moves": 1000,
@@ -188,6 +234,136 @@
             }
         },
         {
+            "resolution": [5, 5],
+            "board_size": [9, 9],
+            "max_moves": 100,
+            "objects": {
+                "floor": {},
+                "characters": {
+                    "characters": [
+                        {
+                            "position": [7, 1],
+                            "on_layer": 0
+                        }
+                    ]
+                },
+                "objects": {
+                    "layers": [
+                        [
+                            "oooxxxooo",
+                            "oooxxxooo",
+                            "oooxxxooo",
+                            "...xxx...",
+                            "...xxx.e.",
+                            ".........",
+                            "xxxxxx...",
+                            "..exxx...",
+                            "...xxx..."
+                        ],
+                        [
+                            "oooxxx...",
+                            "oooxxx...",
+                            "oooxxx...",
+                            "...xxx...",
+                            ".e.xxx...",
+                            "...xxx...",
+                            "xxxxxx...",
+                            "oo.....e.",
+                            "oo......."
+                        ]
+                    ]
+                }
+            }
+        },
+        {
+            "resolution": [2, 2],
+            "board_size": [26, 11],
+            "max_moves": 100,
+            "objects": {
+                "floor": {},
+                "characters": {
+                    "characters": [
+                        {
+                            "position": [13, 5],
+                            "on_layer": 0
+                        }
+                    ]
+                },
+                "objects": {
+                    "layers": [
+                        [
+                            "ooxxooxxooxxooxxooxxooxxoo",
+                            "ooxxooxxooxxooxxooxxooxxoo",
+                            "..xx..xx..xx..xx..xx..xx..",
+                            "..xx..xx..xx..xx..xx..xx..",
+                            "..........................",
+                            "..........................",
+                            "..........................",
+                            "..xx..xx..xx..xx..xx..xx..",
+                            "..xx..xx..xx..xx..xx..xx..",
+                            "ooxxooxxooxxooxxooxxooxxoo",
+                            "ooxxooxxooxxooxxooxxooxxoo"
+                        ],
+                        [
+                            "xxxxxxxxxxxxxxxxxxxxxxxxxx",
+                            "xxxxxxxxxxxxxxxxxxxxxxxxxx",
+                            "xxxxxxxxxxxxxxxxxxxxxxxxxx",
+                            "xxxxxxxxxxxxxxxxxxxxxxxxxx",
+                            "..........................",
+                            "........................e.",
+                            "..........................",
+                            "xxxx..xxxxxxxxxxxxxxxxxxxx",
+                            "xxxx..xxxxxxxxxxxxxxxxxxxx",
+                            "xxxx..xxxxxxxxxxxxxxxxxxxx",
+                            "xxxx..xxxxxxxxxxxxxxxxxxxx"
+                        ]
+                    ]
+                }
+            }
+        },
+        {
+            "resolution": [4, 4],
+            "board_size": [14, 9],
+            "max_moves": 100,
+            "objects": {
+                "floor": {},
+                "characters": {
+                    "characters": [
+                        {
+                            "position": [2, 2],
+                            "on_layer": 0
+                        }
+                    ]
+                },
+                "objects": {
+                    "layers": [
+                        [
+                            "xxxxxxxxxxxxxx",
+                            "xxoxxxoxxxoxxx",
+                            "xo.oxo.oxo.oxx",
+                            "xxoxxxoxxxoxxx",
+                            "xxxxxxxxxxxxxx",
+                            "xxoxxxoxxxoxxx",
+                            "xo.oxoeoxo.oxx",
+                            "xxoxxxoxxx.xxx",
+                            "xxxxxxxxxxxxxx"
+                        ],
+                        [
+                            "xxxxxxxxxx....",
+                            "xxxxxxxxxxoxx.",
+                            ".....oxo.oxxx.",
+                            ".xxxxxoxxxxxx.",
+                            ".xxxxx.xxxxxx.",
+                            ".xxxxx..xxxxx.",
+                            ".oxxxxx..oxxx.",
+                            "xxxxxxoxxxxxx.",
+                            "xxxxxx........"
+                        ]
+                    ]
+                }
+            }
+        },
+        {
             "resolution": [2, 2],
             "board_size": [21, 15],
             "max_moves": 1000,
@@ -236,6 +412,62 @@
                             "oooxxxxxxxxxxxxxxxooo",
                             "ooo....oxxo.......ooo",
                             "oooxxxxxxxxxxxxxxxooo"
+                        ]
+                    ]
+                }
+            }
+        },
+        {
+            "resolution": [3, 3],
+            "board_size": [15, 16],
+            "max_moves": 200,
+            "objects": {
+                "floor": {},
+                "characters": {
+                    "characters": [
+                        {
+                            "position": [7, 0],
+                            "on_layer": 0
+                        }
+                    ]
+                },
+                "objects": {
+                    "layers": [
+                        [
+                            ".e.e.e.e.e.e.e.",
+                            "xxxxxxxxxxxxxxx",
+                            ".xox.xox.xox.xo",
+                            "...............",
+                            "xxxxxxxxxxxxxxx",
+                            "ox.xox.xox.xox.",
+                            "...............",
+                            "xxxxxxxxxxxxxxx",
+                            ".xox.xox.xox.xo",
+                            "...............",
+                            "xxxxxxxxxxxxxxx",
+                            "ox.xox.xox.xox.",
+                            "...............",
+                            "xxxxxxxxxxxxxxx",
+                            ".xox.xox.xox.xo",
+                            "..............."
+                        ],
+                        [
+                            "xxxxxxxxxxxxxxo",
+                            "xxxxxxxxxxxxxx.",
+                            "xxxxxx.xxxxxxx.",
+                            "xxxxox.xxxxxxxx",
+                            "xxxx.xexxxxxxxx",
+                            ".xxx.xoxxxxxxxx",
+                            ".xxxxxxxxxoxxxx",
+                            "exxxxxxxxx.xxxx",
+                            "oxxxxxxxxx.xxx.",
+                            "xxxxxxxxoxxxxx.",
+                            "xxxxxxxx.xxxxxe",
+                            "xxxxxxxx.xxxxxo",
+                            "xxoxxxxxxxxxxxx",
+                            "xx.xxxxxxxxxxxx",
+                            "xx.xxxxxxxxxxxx",
+                            "xxxxxxxxxxxxxxx"
                         ]
                     ]
                 }

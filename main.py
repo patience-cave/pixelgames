@@ -146,6 +146,7 @@ def main():
                     pygame.K_w: "up",
                     pygame.K_s: "down",
                     pygame.K_d: "right",
+                    pygame.K_p: "p",
                     pygame.K_UP: "up",
                     pygame.K_DOWN: "down",
                     pygame.K_LEFT: "left",

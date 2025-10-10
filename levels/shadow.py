@@ -96,6 +96,9 @@ class objects:
             should_step_on = game.get(character["position"])
             game.set(character["position"], "character")
             character["stepping_on"] = should_step_on
+            # if should_step_on == "wall":
+            #     game.set(character["position"], "wall")                
+            #     game.lose = True
 
 
 
@@ -157,6 +160,7 @@ class characters:
             elif game.get(new_position) == "exit":
                 _objects = game.find_object("objects")
                 _objects.reach_exit(game, new_position)
+                character["stepping_on"] = "floor"
 
             game.set(character["position"], was_stepping_on)
             game.set(new_position, "character")

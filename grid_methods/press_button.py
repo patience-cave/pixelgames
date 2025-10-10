@@ -32,6 +32,9 @@ def press_button(self, button):
     elif button == "undo":
         self.undo()
         return
+    elif button == "p":
+        self.win()
+        return
 
     if button_state.up or button_state.down:
         button_state.dy = 1 if button_state.up else -1
