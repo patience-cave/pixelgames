@@ -40,6 +40,10 @@ class objects:
         for position in self.layers[game.current_layer]["exits"]:
             game.set(position, "exit")
 
+        _characters = game.find_object("characters")
+        for character in _characters.all_characters_on_layer(game):
+            game.set(character["position"], "character")
+
     def reach_exit(self, game, position):
         # remove this position from the exit list
         self.layers[game.current_layer]["exits"].remove(position)
@@ -109,9 +113,12 @@ class characters:
             "character": "soft blue"
         }
         self.characters = input.get("characters") or []
+        print(self.characters)
         for character in self.characters:
             if "stepping_on" not in character:
                 character["stepping_on"] = "floor"
+            else:
+                print("should_step_on", character["stepping_on"])
             if "on_layer" not in character:
                 character["on_layer"] = 0
     

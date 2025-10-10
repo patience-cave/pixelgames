@@ -472,6 +472,49 @@
                     ]
                 }
             }
+        },
+        {
+            "resolution": [6, 6],
+            "board_size": [10, 7],
+            "max_moves": 100,
+            "objects": {
+                "floor": {},
+                "characters": {
+                    "characters": [
+                        {
+                            "position": [1, 1],
+                            "on_layer": 0,
+                            "stepping_on": "swapper"
+                        },
+                        {
+                            "position": [1, 5],
+                            "on_layer": 0
+                        }
+                    ]
+                },
+                "objects": {
+                    "layers": [
+                        [
+                            "o.......x.",
+                            "o.......xe",
+                            "o.......x.",
+                            "xxxxxxxxxx",
+                            "ooooooooox",
+                            "ooooooooo.",
+                            "ooooooooox"
+                        ],
+                        [
+                            ".xxxxxxxxo",
+                            "..........",
+                            ".xxxxxxxxo",
+                            "xxxxxxxxxx",
+                            "xxxxxxxx.o",
+                            "xxxxxxxx.o",
+                            "xxxxxxxx.o"
+                        ]
+                    ]
+                }
+            }
         }
     ]
 }
