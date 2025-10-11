@@ -1,0 +1,128 @@
+{
+    "max_levels": 10,
+    "level": 2,
+    "background": "gray",
+    "levels": [
+        {
+            "resolution": [4, 4],
+            "board_size": [10, 10],
+            "max_moves": 1000,
+            "objects": {
+                "floor": {},
+                "chaser": {
+                    "position": [2, 2]
+                },
+                "runners": {
+                    "runners": [
+                        {"position": [7, 7]}
+                    ]
+                },
+                "walls": {
+                    "board": [
+                        "..........",
+                        "xxxxxx....",
+                        ".....x....",
+                        ".....x....",
+                        ".....xxxx.",
+                        "..........",
+                        "..........",
+                        "..........",
+                        "..........",
+                        ".........."
+                    ]
+                }
+            }
+        },
+        {
+            "resolution": [4, 4],
+            "board_size": [11, 11],
+            "max_moves": 1000,
+            "objects": {
+                "floor": {},
+                "chaser": {
+                    "position": [0, 0]
+                },
+                "runners": {
+                    "runners": [
+                        {"position": [10, 0]}
+                    ]
+                },
+                "walls": {
+                    "board": [
+                        "...........",
+                        ".xxxxxxxxxx",
+                        "...........",
+                        "xx.xx.xx.xx",
+                        "...........",
+                        ".xx.xx.xx.x",
+                        "...........",
+                        "xx.xx.xx.xx",
+                        "...........",
+                        ".xx.xx.xx.x",
+                        "..........."
+                    ]
+                }
+            }
+        },
+        {
+            "resolution": [4, 4],
+            "board_size": [10, 10],
+            "max_moves": 1000,
+            "objects": {
+                "floor": {},
+                "chaser": {
+                    "position": [2, 2]
+                },
+                "runners": {
+                    "runners": [
+                        {"position": [5, 5]}
+                    ]
+                },
+                "walls": {
+                    "board": [
+                        "..........",
+                        "...xxxx...",
+                        "..........",
+                        "..........",
+                        "..........",
+                        "..........",
+                        "..........",
+                        ".......o..",
+                        "..........",
+                        ".........."
+                    ]
+                }
+            }
+        },
+        {
+            "resolution": [4, 4],
+            "board_size": [10, 10],
+            "max_moves": 1000,
+            "objects": {
+                "floor": {},
+                "chaser": {
+                    "position": [2, 2]
+                },
+                "runners": {
+                    "runners": [
+                        {"position": [8, 8]}
+                    ]
+                },
+                "walls": {
+                    "board": [
+                        "..........",
+                        "..........",
+                        "..o.......",
+                        "...o......",
+                        "....o.....",
+                        ".....o....",
+                        "......o...",
+                        ".......o..",
+                        "..........",
+                        ".........."
+                    ]
+                }
+            }
+        }
+    ]
+}    

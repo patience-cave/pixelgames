@@ -42,6 +42,8 @@ class game_template:
                 (game.actual_size[0] - level_data["board_size"][0] * game.resolution[0]) // 2,
                 (game.actual_size[1] - level_data["board_size"][1] * game.resolution[1]) // 2
             ]
+        game.width = level_data["board_size"][0]
+        game.height = level_data["board_size"][1]
 
         objects = level_data["objects"]
 

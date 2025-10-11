@@ -4,11 +4,13 @@ try:
     from levels.snake import snake_game
     from levels.shadow import shadow_game
     from levels.colortheory import colortheory_game
+    from levels.chase import chase_game
 except ImportError:
     from as66 import as66_game
     from snake import snake_game
     from shadow import shadow_game
     from colortheory import colortheory_game
+    from chase import chase_game
 
 def choose_game(game_name, game):
     if game_name == "snake":
@@ -19,6 +21,8 @@ def choose_game(game_name, game):
         return shadow_game(game)
     elif game_name == "colortheory":
         return colortheory_game(game)
+    elif game_name == "chase":
+        return chase_game(game)
     else:
         raise ValueError(f"Invalid game name: {game_name}")
 
