@@ -7,7 +7,7 @@ def press_tile(self, position):
     self.current_state = self.current_state.duplicate()
     self.current_state.event = "press_button"
 
-    self.press_tile_method(self.current_state, position[0], position[1])
+    self.press_tile_method(self.current_state, position)
 
     # do not save the new state if no changes happened on screen
     if self.has_intended_actions():

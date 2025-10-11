@@ -1,0 +1,22 @@
+{
+    "max_levels": 9,
+    "background": "gray",
+    "levels": [
+        {
+            "resolution": [4, 4],
+            "board_size": [12, 12],
+            "max_moves": 15,
+            "objects": {
+                "floor": {},
+                "theory": {
+                    "board": [
+                        "....b...R.",
+                        "r.......R.",
+                        "........R.",
+                        "....y....."
+                    ]
+                }
+            }
+        }
+    ]
+}

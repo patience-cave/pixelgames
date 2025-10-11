@@ -2,6 +2,22 @@
 
 import math
 
+def frontier_positions(positions):
+    """Return all orthogonal neighbors of positions that are not in the set."""
+    deltas = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+    result = set()
+    for x, y in positions:
+        for dx, dy in deltas:
+            neighbor = (x + dx, y + dy)
+            if neighbor not in positions:
+                result.add(neighbor)
+    return result
+
+def convert_tile_to_board(game, tile):
+    tilex = tile[0] - game.origin[0]
+    tiley = tile[1] - game.origin[1]
+    return [tilex // game.resolution[0], tiley // game.resolution[1]]
+
 
 def diagonals(size):
     """Generate diagonals (x, y) for a grid of size [width, height]."""

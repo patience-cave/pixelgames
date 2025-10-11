@@ -19,6 +19,14 @@ _color_to_rgb = {
     "pink": (255, 105, 180),
     "soft blue": (115, 144, 250),
     "very dark red": (50, 0, 0),
+    "light red": (255, 100, 100),
+    "light orange": (255, 165, 100),
+    "light yellow": (255, 255, 100),
+    "light green": (144, 238, 144),
+    "light blue": (173, 216, 230),
+    "light purple": (216, 191, 216),
+    "light brown": (210, 180, 140),
+    "brown": (160, 80, 0),
 }
 
 

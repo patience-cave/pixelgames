@@ -3,7 +3,7 @@ import pygame
 from grid import grid_stateful
 from level import choose_game
 
-THE_GAME = "shadow"
+THE_GAME = "colortheory"
 
 class game:
 

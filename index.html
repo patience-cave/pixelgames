@@ -178,7 +178,7 @@
     // Python bridge via Pyodide
     // --------------------------
     let pyodide, boardReady = false;
-    const LEVELS = ["snake", "as66", "shadow"];
+    const LEVELS = ["snake", "as66", "shadow", "colortheory"];
     let currentLevel = "snake";
 
     const time = (label) => ({
@@ -221,7 +221,7 @@ async function loadPython() {
     "reset","set","spotlight","undo","update","win"
   ];
   const game_template_files = [
-    "as66", "snake", "shadow"
+    "as66", "snake", "shadow", "colortheory"
   ];
 
   try {
