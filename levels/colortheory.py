@@ -9,8 +9,8 @@ class theory:
         self.colors = {
             "red-blob": (200, 0, 0),
             "red-end": (200, 0, 0),
-            "orange-blob": (200, 50, 0),
-            "orange-end": (200, 60, 0),
+            "orange-blob": (252, 114, 15),
+            "orange-end": (252, 114, 15),
             "yellow-blob": (200, 200, 0),    
             "yellow-end": (200, 200, 0),    
             "green-blob": (0, 150, 0),
@@ -19,9 +19,10 @@ class theory:
             "blue-end": (50, 50, 250),
             "purple-blob": (120, 55, 160),
             "purple-end": (120, 55, 160),
-            "brown-blob": "brown",
-            "brown-end": "light brown",
+            "brown-blob": (160, 100, 30),
+            "brown-end": (160, 100, 30),
             "black-block": "black",
+            "end-edge": "black"
         }
         self.positions = {}
         codes = {
@@ -47,16 +48,22 @@ class theory:
                     fixed_pos_x2 = position[0] * game.resolution[0] + game.resolution[0] - 1
                     fixed_pos_y = position[1] * game.resolution[1]
                     fixed_pos_y2 = position[1] * game.resolution[1] + game.resolution[1] - 1
-                    game.set([fixed_pos_x, fixed_pos_y + i], "floor", _resolution=False)
-                    game.set([fixed_pos_x2, fixed_pos_y + i], "floor", _resolution=False)
-                    game.set([fixed_pos_x + i, fixed_pos_y], "floor", _resolution=False)
-                    game.set([fixed_pos_x + i, fixed_pos_y2], "floor", _resolution=False)
+                    game.set([fixed_pos_x, fixed_pos_y + i], "end-edge", _resolution=False)
+                    game.set([fixed_pos_x2, fixed_pos_y + i], "end-edge", _resolution=False)
+                    game.set([fixed_pos_x + i, fixed_pos_y], "end-edge", _resolution=False)
+                    game.set([fixed_pos_x + i, fixed_pos_y2], "end-edge", _resolution=False)
             else:
                 game.set(position, color)
     
     def get_tile(self, game, position):
         _position = (position[0], position[1])
         return self.positions.get(_position, "floor")
+
+    def any_end_positions(self, game):
+        for position, color in self.positions.items():
+            if color.endswith("-end"):
+                return True
+        return False
 
     def blob(self, game, position):
         expanded_positions = set()
@@ -165,6 +172,9 @@ class colortheory_game(game_template):
         converted_tile = convert_tile_to_board(game, tile)
 
         game.find_object("theory").tapped(game, converted_tile)
+
+        if not game.find_object("theory").any_end_positions(game):
+            game.win = True
 
         if game.is_modified():
             game.find_object("moves_left").use_move(game)
